@@ -1,0 +1,470 @@
+
+
+@import url('https://googleapis.com');
+
+.gestor-reservas-wrapper {
+    font-family: 'Inter', sans-serif;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #f8fafc;
+    border-radius: 16px;
+
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+
+    color: #1e293b;
+
+}
+
+
+
+.gestor-titulo {
+
+    font-size: 26px;
+
+    font-weight: 700;
+
+    margin-bottom: 28px;
+
+    color: #0f172a;
+
+    border-bottom: 2px solid #e2e8f0;
+
+    padding-bottom: 14px;
+
+}
+
+
+
+/* ==========================================================================
+
+   Tabla Moderna y Responsive
+
+   ========================================================================== */
+
+.tabla-reservas-panchita {
+
+    width: 100%;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+
+}
+
+
+
+.tabla-reservas-panchita th {
+
+    background-color: #f1f5f9;
+
+    color: #475569;
+
+    font-weight: 600;
+
+    font-size: 14px;
+
+    text-align: left;
+
+    padding: 16px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+}
+
+
+
+.tabla-reservas-panchita td {
+
+    padding: 16px;
+
+    font-size: 14px;
+
+    color: #334155;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    vertical-align: middle;
+
+}
+
+
+
+.tabla-reservas-panchita tr:last-child td {
+
+    border-bottom: none;
+
+}
+
+
+
+.tabla-reservas-panchita tr:hover td {
+
+    background-color: #f8fafc;
+
+}
+
+
+
+/* ==========================================================================
+
+   Badges (Etiquetas de Estado)
+
+   ========================================================================== */
+
+.badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 6px 12px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    text-transform: capitalize;
+
+    border-radius: 9999px;
+
+}
+
+
+
+.badge-pendiente { background-color: #fef3c7; color: #d97706; }
+
+.badge-confirmada { background-color: #dbeafe; color: #2563eb; }
+
+.badge-asistió { background-color: #dcfce7; color: #15803d; }
+
+.badge-cancelada { background-color: #fee2e2; color: #b91c1c; }
+
+.badge-pagado { background-color: #dcfce7; color: #15803d; }
+
+
+
+/* ==========================================================================
+
+   Botones de Acción y Pago
+
+   ========================================================================== */
+
+.btn-accion {
+
+    background: #ffffff;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    padding: 8px 14px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    font-weight: 500;
+
+    color: #475569;
+
+    transition: all 0.2s ease;
+
+}
+
+
+
+.btn-accion:hover {
+
+    background-color: #f1f5f9;
+
+    border-color: #94a3b8;
+
+    color: #0f172a;
+
+}
+
+
+
+.btn-pago {
+
+    background-color: #10b981;
+
+    color: #ffffff;
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 8px 14px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.15);
+
+    transition: background-color 0.2s ease, transform 0.1s ease;
+
+}
+
+
+
+.btn-pago:hover {
+
+    background-color: #059669;
+
+}
+
+
+
+.btn-pago:active {
+
+    transform: scale(0.97);
+
+}
+
+
+
+/* ==========================================================================
+
+   Ventana Modal (Overlay y Contenido)
+
+   ========================================================================== */
+
+.modal-overlay {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background-color: rgba(15, 23, 42, 0.4); /* Fondo oscuro translúcido */
+
+    backdrop-filter: blur(4px); /* Efecto difuminado moderno */
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 1000;
+
+    animation: fadeIn 0.25s ease-out;
+
+}
+
+
+
+.modal-contenido {
+
+    background-color: #ffffff;
+
+    width: 100%;
+
+    max-width: 480px;
+
+    padding: 32px;
+
+    border-radius: 16px;
+
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+}
+
+
+
+.modal-contenido h3 {
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    color: #0f172a;
+
+    margin: 0 0 24px 0;
+
+}
+
+
+
+/* Formulario dentro del Modal */
+
+.modal-contenido label {
+
+    display: block;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #475569;
+
+    margin-bottom: 6px;
+
+    margin-top: 16px;
+
+}
+
+
+
+.modal-contenido label:first-of-type {
+
+    margin-top: 0;
+
+}
+
+
+
+.modal-contenido input[type="datetime-local"],
+
+.modal-contenido input[type="number"],
+
+.modal-contenido select,
+
+.modal-contenido textarea {
+
+    width: 100%;
+
+    padding: 10px 14px;
+
+    font-family: 'Inter', sans-serif;
+
+    font-size: 14px;
+
+    color: #1e293b;
+
+    background-color: #ffffff;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 8px;
+
+    box-sizing: border-box;
+
+    outline: none;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+}
+
+
+
+.modal-contenido input:focus,
+
+.modal-contenido select:focus,
+
+.modal-contenido textarea:focus {
+
+    border-color: #3b82f6;
+
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+
+}
+
+
+
+.modal-contenido textarea {
+
+    height: 90px;
+
+    resize: vertical;
+
+}
+
+
+
+/* Botonera del Modal */
+
+.modal-botones {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 28px;
+
+    border-top: 1px solid #e2e8f0;
+
+    padding-top: 20px;
+
+}
+
+
+
+.modal-botones .btn-pago {
+
+    background-color: #2563eb; /* Azul primario para guardar cambios */
+
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.15);
+
+}
+
+
+
+.modal-botones .btn-pago:hover {
+
+    background-color: #1d4ed8;
+
+}
+
+
+
+/* ==========================================================================
+
+   Animaciones Fluidas
+
+   ========================================================================== */
+
+@keyframes fadeIn {
+
+    from { opacity: 0; }
+
+    to { opacity: 1; }
+
+}
+
+
+
+@keyframes slideUp {
+
+    from {
+
+        transform: translateY(20px);
+
+        opacity: 0;
+
+    }
+
+    to {
+
+        transform: translateY(0);
+
+        opacity: 1;
+
+    }
+
+} 
+

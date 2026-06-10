@@ -1,0 +1,407 @@
+
+:root {
+  --bg-main: #fcfaf7;          /* Fondo crema/marfil muy elegante */
+  --bg-card: #ffffff;          /* Blanco puro para los paneles internos */
+  --bg-input: #f4eee9;         /* Tono pergamino suave para inputs y filtros */
+  --brand-orange: #bc5a1a;     /* El naranja corporativo de Panchita */
+  --brand-orange-hover: #df6b20;
+  --brand-dark: #261915;       /* Marrón café profundo para textos principales */
+  --text-muted: #6e5e58;       /* Gris marrón para textos secundarios */
+  --border-subtle: #e6ded7;     /* Bordes finos y limpios */
+  --shadow-premium: rgba(38, 25, 21, 0.08);
+}
+
+.fondo-envolvente-iluminado {
+  width: 100%;
+  background-color: #f5ece4; 
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(245, 236, 228, 0.2) 100%), 
+                    url('https://www.transparenttextures.com/patterns/cream-paper.png');
+  padding: 40px 0; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modulo-reservas-visual-container {
+  display: flex;
+  gap: 40px;
+  width: 96%;
+  max-width: 1600px; /* Ancho ideal expandido para pantallas modernas */
+  min-height: 850px; /* Forzamos una altura imponente y equilibrada */
+  margin: 0 auto;
+  background-color: #ffffff; 
+  padding: 45px;
+  border-radius: 24px;
+  border: 1px solid rgba(188, 90, 26, 0.15); 
+  box-shadow: 0 30px 70px rgba(38, 25, 21, 0.08), 
+              0 10px 25px rgba(38, 25, 21, 0.04);
+  font-family: 'Poppins', sans-serif;
+  color: #261915;
+  align-items: stretch; /* Obliga a que la columna derecha e izquierda midan idéntico */
+}
+
+/* ==========================================================================
+   3. SECCIÓN IZQUIERDA: MAPA DEL SALÓN
+   ========================================================================== */
+.seccion-mapa-interactivo {
+  flex: 1.4; /* Le da prioridad de ancho al mapa de mesas */
+  display: flex;
+  flex-direction: column;
+}
+
+.encabezado-mapa h3 {
+  color: var(--brand-dark);
+  font-size: 26px;
+  margin-bottom: 6px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.encabezado-mapa p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.selector-salas-botones {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 25px;
+}
+
+.btn-sala {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--brand-dark);
+  padding: 12px 26px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 2px 4px var(--shadow-premium);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-sala:hover {
+  background-color: var(--bg-input);
+  border-color: var(--brand-orange);
+}
+
+.btn-sala.activo {
+  background: linear-gradient(135deg, var(--brand-orange), #a04610);
+  color: #fff;
+  border-color: var(--brand-orange);
+  box-shadow: 0 8px 20px rgba(188, 90, 26, 0.3);
+}
+
+.barra-filtros {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--bg-card);
+  padding: 14px 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 10px var(--shadow-premium);
+}
+
+.filtros-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.chip-filtro {
+  background-color: var(--bg-input);
+  border: 1px solid transparent;
+  color: var(--brand-dark);
+  padding: 8px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.chip-filtro:hover {
+  background-color: var(--border-subtle);
+  color: var(--brand-orange);
+}
+
+.chip-filtro.activo {
+  background-color: var(--brand-dark);
+  color: #fff;
+}
+
+.disponibles-count {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--brand-orange);
+  background-color: rgba(188, 90, 26, 0.1);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.contenedor-arquitectura-salon {
+  background-color: #fcfcfc;
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 40px;
+  flex-grow: 1; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around; 
+  align-items: stretch;
+  gap: 25px;
+}
+
+.textura-piso {
+  background-image: linear-gradient(rgba(252, 252, 252, 0.94), rgba(252, 252, 252, 0.94)), 
+                    url('https://www.transparenttextures.com/patterns/cream-paper.png');
+}
+
+.elemento-barra-licores {
+  text-align: center;
+  background: linear-gradient(90deg, rgba(188,90,26,0.02), rgba(188,90,26,0.08), rgba(188,90,26,0.02));
+  border: 1px dashed var(--brand-orange);
+  color: var(--brand-orange);
+  padding: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  border-radius: 10px;
+}
+
+.elemento-entrada-principal {
+  text-align: center;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--brand-dark);
+  padding: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  letter-spacing: 2px;
+}
+
+.grid-arquitectura-mesas-imagenes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px 50px;
+  align-items: center;
+  height: auto; 
+}
+
+.contenedor-mesa-real {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.imagen-mueble-cenital {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0px 10px 15px rgba(38, 25, 21, 0.25));
+  transition: all 0.3s ease;
+}
+
+.m2p { max-width: 85px; justify-self: center; }
+.m4p { max-width: 105px; justify-self: center; }
+.m6p { max-width: 140px; justify-self: center; }
+
+.etiqueta-mesa-flotante {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.num-real { 
+  font-size: 16px; 
+  color: var(--brand-dark); 
+  font-weight: 800;
+}
+
+.cap-real { 
+  font-size: 11px; 
+  color: var(--brand-orange);
+  font-weight: 700;
+}
+
+.contenedor-mesa-real.disponible:hover { transform: scale(1.1); }
+.contenedor-mesa-real.disponible:hover .imagen-mueble-cenital { filter: drop-shadow(0px 14px 20px rgba(38, 25, 21, 0.4)) brightness(1.05); }
+.contenedor-mesa-real.ocupada { cursor: not-allowed; }
+.contenedor-mesa-real.ocupada .imagen-mueble-cenital { filter: grayscale(0.9) opacity(0.3); }
+.contenedor-mesa-real.ocupada .num-real { color: #a08f88; }
+
+.candado-ocupado {
+  position: absolute;
+  background-color: #fff1f1;
+  color: #d93838;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid #ffccd0;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.contenedor-mesa-real.seleccionada { transform: scale(1.08); }
+.contenedor-mesa-real.seleccionada .imagen-mueble-cenital { filter: drop-shadow(0px 0px 15px rgba(188, 90, 26, 0.6)) brightness(1.1); }
+.contenedor-mesa-real.seleccionada .num-real { color: var(--brand-orange); font-size: 18px; }
+
+.leyenda-mapa-restaurante {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+  justify-content: center;
+}
+
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--brand-dark);
+  font-weight: 600;
+}
+
+.muestra { width: 16px; height: 16px; border-radius: 6px; }
+.muestra.disponible-img { background-color: #ffffff; border: 2px solid var(--border-subtle); }
+.muestra.ocupada-img { background-color: #f2eded; border: 2px solid #e1d5d5; opacity: 0.5; }
+.muestra.elegida-img { background-color: var(--brand-orange); border: 2px solid var(--brand-orange); box-shadow: 0 0 10px rgba(188, 90, 26, 0.3); }
+
+/* ==========================================================================
+   4. SECCIÓN DERECHA: FORMULARIO VIP (AJUSTADO Y SIN HUECOS)
+   ========================================================================== */
+.seccion-formulario-detalles {
+  flex: 1; 
+  background-color: #ffffff; 
+  padding: 40px 35px;
+  border-radius: 18px;
+  border: 1px solid rgba(188, 90, 26, 0.08);
+  
+  /* SISTEMA ANTI-ESPACIOS VACÍOS */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Agrupa todo ordenadamente arriba */
+  gap: 0; /* Controlamos los espacios de manera independiente */
+}
+
+.seccion-formulario-detalles h3 {
+  color: var(--brand-dark);
+  font-size: 24px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.seccion-formulario-detalles p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 25px; /* Espacio controlado bajo el subtítulo */
+}
+
+.caja-resumen-mesa-elegida {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: rgba(188, 90, 26, 0.05);
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(188, 90, 26, 0.2);
+  margin-bottom: 25px;
+}
+
+.icono-resumen { font-size: 22px; }
+.caja-resumen-mesa-elegida h4 { font-size: 14px; color: var(--brand-dark); margin: 0; font-weight: 700; }
+.caja-resumen-mesa-elegida p { font-size: 13px; color: var(--brand-orange); margin: 4px 0 0 0; font-weight: 600; }
+
+.input-reserva-premium {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px; /* Separación fija y compacta entre inputs */
+}
+
+.input-reserva-premium label {
+  font-size: 13px;
+  color: var(--brand-dark);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.input-reserva-premium input, 
+.input-reserva-premium select,
+.textarea-nota {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--brand-dark);
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.input-reserva-premium input:focus, 
+.input-reserva-premium select:focus,
+.textarea-nota:focus {
+  border-color: var(--brand-orange);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(188, 90, 26, 0.1);
+}
+
+.textarea-nota {
+  resize: none;
+  min-height: 90px;
+  margin-bottom: 20px;
+}
+
+.btn-enviar-reserva-final {
+  width: 100%;
+  background: linear-gradient(135deg, var(--brand-orange), #a04610);
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(188, 90, 26, 0.25);
+  transition: all 0.3s ease;
+  margin-top: auto; 
+}
+
+.btn-enviar-reserva-final:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--brand-orange-hover), var(--brand-orange));
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(188, 90, 26, 0.4);
+}
+
+.btn-enviar-reserva-final:disabled {
+  background: #e1deda;
+  color: #a6a19c;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.nota-whatsapp {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  font-weight: 600;
+}

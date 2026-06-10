@@ -1,0 +1,34 @@
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  /* El scroll vertical se maneja únicamente aquí a nivel global */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f7f7f7;
+  /* Evita que el body duplique el scroll del html */
+  overflow: visible; 
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #120904;
+  /* Deja que el contenido fluya hacia abajo naturalmente sin encerrarlo */
+  overflow: visible;
+}
