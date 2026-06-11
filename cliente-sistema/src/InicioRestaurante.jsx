@@ -4,6 +4,7 @@ import logoPanchita from './assets/panchita.png';
 import HeroParallax from './HeroParallax';
 import imgTradicion from './assets/tradicion.jpg';
 import FormularioReserva from './FormularioReserva'; 
+import NuestraCarta from './NuestraCarta';
 
 // 🌟 CORRECCIÓN DE PARÁMETROS: Recibimos exactamente 'usuarioLogueado' como viene de App.jsx
 export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
@@ -73,7 +74,7 @@ export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
         </div>
         <ul className="nav-links-restaurante">
           <li onClick={() => setSeccionActiva('portada')} style={{ cursor: 'pointer' }}>INICIO</li>
-          <li>NUESTRA CARTA ▾</li>
+          <li onClick={() => setSeccionActiva('carta')}>NUESTRA CARTA ▾</li>
           <li>TE BRINDAMOS</li>
           <li>GALERÍA</li>
           <li>NUESTRA HISTORIA</li>
@@ -178,6 +179,11 @@ export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
             </div>
           </section>
         </>
+      ): seccionActiva == 'carta'  ? (
+        /* VISTA DE NUESTRA CARTA */
+        <div>
+          <NuestraCarta usuarioLogueado={usuarioLogueado}/>
+        </div>
       ) : (
         /* ── VISTA DEDICADA DE RESERVAS ── */
         <div className="seccion-reserva-vistas-pagina" style={{ paddingTop: '140px', paddingBottom: '60px' }}>

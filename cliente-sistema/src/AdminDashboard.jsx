@@ -6,26 +6,27 @@ import MapaSalon from './MapaSalon.jsx';                       // ← NUEVO
 import { useNotificaciones } from './Usenotificaciones.js';  // ← NUEVO
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import GestionDelivery from './Gestiondelibery';
+import NuestraCarta from './NuestraCarta.jsx';
 
 
 export default function AdminDashboard({ usuarioLogueado, onLogout }) {
-  const [seccionActiva, setSeccionActiva]   = useState('panel');
-  const [cargando, setCargando]             = useState(true);
-  const [error, setError]                   = useState(null);
+  const [seccionActiva, setSeccionActiva] = useState('panel');
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
   const [ultimaActualizacion, setUltimaActualizacion] = useState(null);
-  const [tiempoDesde, setTiempoDesde]       = useState('');
+  const [tiempoDesde, setTiempoDesde] = useState('');
   const [proximasReservas, setProximasReservas] = useState([]);
 
   const [metricas, setMetricas] = useState({
-    ingresosDia:         0,
-    ordenesActivas:      0,
-    reservasHoy:         0,
-    ticketPromedio:      0,
-    flujoHorarios:       Array(24).fill(0),
-    mesasOcupadas:       0,
-    mesasTotales:        0,
+    ingresosDia: 0,
+    ordenesActivas: 0,
+    reservasHoy: 0,
+    ticketPromedio: 0,
+    flujoHorarios: Array(24).fill(0),
+    mesasOcupadas: 0,
+    mesasTotales: 0,
     ingresosDiaAnterior: 0,
-    reservasAyer:        0,
+    reservasAyer: 0,
   });
 
   // ── Sistema de notificaciones push ────────────────────────────────────────
@@ -38,10 +39,10 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
     new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(valor || 0);
 
   const calcularTendencia = (hoy, ayer) => {
-    const h = parseFloat(hoy)  || 0;
+    const h = parseFloat(hoy) || 0;
     const a = parseFloat(ayer) || 0;
     if (a === 0 && h === 0) return { texto: '— sin datos', positivo: null };
-    if (a === 0)             return { texto: '▲ nuevo',    positivo: true  };
+    if (a === 0) return { texto: '▲ nuevo', positivo: true };
     const pct = (((h - a) / a) * 100).toFixed(1);
     const positivo = h >= a;
     return { texto: `${positivo ? '▲' : '▼'} ${Math.abs(pct)}% vs ayer`, positivo };
@@ -53,9 +54,9 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
     if (!ultimaActualizacion) return;
     const tick = () => {
       const seg = Math.floor((Date.now() - ultimaActualizacion) / 1000);
-      if (seg < 60)        setTiempoDesde(`hace ${seg}s`);
+      if (seg < 60) setTiempoDesde(`hace ${seg}s`);
       else if (seg < 3600) setTiempoDesde(`hace ${Math.floor(seg / 60)}min`);
-      else                 setTiempoDesde(`hace ${Math.floor(seg / 3600)}h`);
+      else setTiempoDesde(`hace ${Math.floor(seg / 3600)}h`);
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -64,38 +65,38 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
 
   // ─── Carga de métricas ────────────────────────────────────────────────────
 
-const cargarDatosDashboard = useCallback(() => {
-  // CAMBIA ESTO DE VUELTA A LA RUTA DEL DASHBOARD
-  fetch('http://localhost:8080/api/admin/dashboard-stats') 
-    .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
-    .then((data) => {
-      console.log("Datos recibidos del servidor:", data);
-      setMetricas({
-        ingresosDia:         data.ingresosDia         || 0,
-        ordenesActivas:      data.ordenesActivas      || 0,
-        reservasHoy:         data.reservasHoy         || 0,
-        ticketPromedio:      data.ticketPromedio      || 0,
-        flujoHorarios:       data.flujoHorarios       || Array(24).fill(0),
-        mesasOcupadas:       data.mesasOcupadas       || 0,
-        mesasTotales:        data.mesasTotales        || 0,
-        ingresosDiaAnterior: data.ingresosDiaAnterior || 0,
-        reservasAyer:        data.reservasAyer        || 0,
+  const cargarDatosDashboard = useCallback(() => {
+    // CAMBIA ESTO DE VUELTA A LA RUTA DEL DASHBOARD
+    fetch('http://localhost:8080/api/admin/dashboard-stats')
+      .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+      .then((data) => {
+        console.log("Datos recibidos del servidor:", data);
+        setMetricas({
+          ingresosDia: data.ingresosDia || 0,
+          ordenesActivas: data.ordenesActivas || 0,
+          reservasHoy: data.reservasHoy || 0,
+          ticketPromedio: data.ticketPromedio || 0,
+          flujoHorarios: data.flujoHorarios || Array(24).fill(0),
+          mesasOcupadas: data.mesasOcupadas || 0,
+          mesasTotales: data.mesasTotales || 0,
+          ingresosDiaAnterior: data.ingresosDiaAnterior || 0,
+          reservasAyer: data.reservasAyer || 0,
+        });
+        setUltimaActualizacion(Date.now());
+        setError(null);
+        setCargando(false);
+      })
+      .catch((err) => {
+        console.error('Error métricas:', err);
+        setError('No se pudieron cargar las métricas.');
+        setCargando(false);
       });
-      setUltimaActualizacion(Date.now());
-      setError(null);
-      setCargando(false);
-    })
-    .catch((err) => {
-      console.error('Error métricas:', err);
-      setError('No se pudieron cargar las métricas.');
-      setCargando(false);
-    });
-}, []);
+  }, []);
 
   // ─── Carga de próximas reservas ───────────────────────────────────────────
 
   const cargarProximasReservas = useCallback(() => {
-    fetch('http://localhost:8080/api/reservas') 
+    fetch('http://localhost:8080/api/reservas')
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data) => setProximasReservas(Array.isArray(data) ? data.slice(0, 5) : []))
       .catch(() => setProximasReservas([]));
@@ -125,8 +126,8 @@ const cargarDatosDashboard = useCallback(() => {
 
   const colorBarraOcupacion =
     pctOcupacion >= 90 ? '#d32f2f' :
-    pctOcupacion >= 70 ? '#e65100' :
-    '#bc5a1a';
+      pctOcupacion >= 70 ? '#e65100' :
+        '#bc5a1a';
 
   const tendenciaIngresos = calcularTendencia(metricas.ingresosDia, metricas.ingresosDiaAnterior);
   const tendenciaReservas = calcularTendencia(metricas.reservasHoy, metricas.reservasAyer);
@@ -187,7 +188,7 @@ const cargarDatosDashboard = useCallback(() => {
           >
             🚪 Abrir Salas
           </button>
-              <button 
+          <button
             className={`menu-item ${seccionActiva === 'delivery' ? 'active' : ''}`}
             onClick={() => setSeccionActiva('delivery')}
           >
@@ -195,7 +196,10 @@ const cargarDatosDashboard = useCallback(() => {
           </button>
           <button className="menu-item disabled-tab">📋 Historial</button>
           <button className="menu-item disabled-tab">🚗 Estacionamiento</button>
-          <button className="menu-item disabled-tab">🍳 Platos / Carta</button>
+          <button className={`menu-item ${seccionActiva === 'carta' ? 'active' : ''}`}
+            onClick={() => setSeccionActiva('carta')}
+          >
+            🍳 Platos / Carta</button>
           <button className="menu-item disabled-tab">📊 Reportes</button>
         </nav>
 
@@ -349,9 +353,10 @@ const cargarDatosDashboard = useCallback(() => {
             <MapaSalon onAlerta={recibirAlertaMesa} />
           )}
 
-          {seccionActiva === 'salas'    && <GestionMesas />}
+          {seccionActiva === 'salas' && <GestionMesas />}
           {seccionActiva === 'reservas' && <GestorReservas />}
           {seccionActiva === 'delivery' && <GestionDelivery />}
+          {seccionActiva === 'carta' && <NuestraCarta usuarioLogueado={usuarioLogueado}/>}
 
         </div>
       </main>

@@ -1,0 +1,584 @@
+/* ==========================================================================
+   NUESTRA CARTA — Estilos
+   Paleta: oscuro #1c0f07 · naranja #c1440e · dorado #d4963a · crema #f5f0ea
+   ========================================================================== */
+
+.carta-wrapper {
+  background-color: #f5f0ea;
+  min-height: 100vh;
+  padding: 60px 40px 80px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* ── TOAST ── */
+.carta-toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+  animation: slideInToast 0.3s ease;
+}
+.carta-toast--ok    { background-color: #1c0f07; color: #d4963a; }
+.carta-toast--warn  { background-color: #c1440e; color: #fff; }
+.carta-toast--error { background-color: #7a1010; color: #fff; }
+
+@keyframes slideInToast {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── ENCABEZADO ── */
+.carta-header {
+  margin-bottom: 40px;
+}
+
+.carta-header__grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 12px;
+}
+
+.carta-header__centro {
+  text-align: center;
+}
+
+.carta-header__acciones {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 6px;
+}
+
+.carta-eyebrow {
+  display: block;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: #c1440e;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.carta-titulo {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.8rem;
+  color: #1c0f07;
+  margin: 0 0 16px;
+  line-height: 1.15;
+}
+
+.carta-separador {
+  width: 60px;
+  height: 3px;
+  background-color: #d4963a;
+  margin: 0 auto 20px;
+  border: none;
+}
+
+.carta-subtitulo {
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  color: #6b4c3b;
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ── BOTÓN "+" ── */
+.btn-agregar-plato {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background-color: #c1440e;
+  color: #fff;
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(193, 68, 14, 0.4);
+  transition: background-color 0.2s ease, transform 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-agregar-plato:hover {
+  background-color: #a33509;
+  transform: scale(1.1) rotate(90deg);
+}
+
+/* ── FILTROS ── */
+.carta-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 48px;
+}
+
+.carta-chip {
+  background: transparent;
+  border: 1.5px solid #c1440e;
+  color: #c1440e;
+  padding: 6px 18px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: 'Lato', sans-serif;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.carta-chip:hover,
+.carta-chip.activo {
+  background-color: #c1440e;
+  color: #fff;
+}
+
+/* ── GRID ── */
+.carta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ── CARD ── */
+.plato-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(28, 15, 7, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.plato-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(28, 15, 7, 0.18);
+}
+
+.plato-card--inactivo {
+  opacity: 0.5;
+  filter: grayscale(45%);
+}
+
+/* Imagen */
+.plato-card__imagen-wrap {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.plato-card__imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.plato-card:hover .plato-card__imagen {
+  transform: scale(1.05);
+}
+
+/* Badge categoría — izquierda */
+.plato-card__categoria {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: rgba(28, 15, 7, 0.75);
+  color: #d4963a;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: 'Lato', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── TOGGLE ESTADO — derecha ── */
+.plato-card__toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(28, 15, 7, 0.70);
+  border: none;
+  border-radius: 20px;
+  padding: 4px 8px 4px 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease;
+}
+
+.plato-card__toggle:hover {
+  background: rgba(28, 15, 7, 0.92);
+}
+
+.toggle-track {
+  width: 28px;
+  height: 15px;
+  border-radius: 10px;
+  background-color: #666;
+  position: relative;
+  transition: background-color 0.25s ease;
+  flex-shrink: 0;
+}
+
+.plato-card__toggle.activo .toggle-track {
+  background-color: #d4963a;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: transform 0.25s ease;
+}
+
+.plato-card__toggle.activo .toggle-thumb {
+  transform: translateX(13px);
+}
+
+.toggle-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  font-family: 'Lato', sans-serif;
+  letter-spacing: 0.5px;
+  color: #bbb;
+  min-width: 18px;
+}
+
+.plato-card__toggle.activo .toggle-label {
+  color: #d4963a;
+}
+
+/* Body card */
+.plato-card__body {
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 12px;
+}
+
+.plato-card__info { flex: 1; }
+
+.plato-card__nombre {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.1rem;
+  color: #1c0f07;
+  margin: 0 0 6px;
+}
+
+.plato-card__descripcion {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.82rem;
+  color: #7a5c4e;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Footer card */
+.plato-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f0e8de;
+  padding-top: 12px;
+}
+
+.plato-card__precio {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #c1440e;
+}
+
+.plato-card__btn {
+  background-color: #1c0f07;
+  color: #d4963a;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: 'Lato', sans-serif;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.plato-card__btn:hover {
+  background-color: #c1440e;
+  color: #fff;
+}
+
+/* ==========================================================================
+   MODAL
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 5, 2, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeOverlay 0.2s ease;
+}
+
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-panel {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: slideModal 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes slideModal {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid #f0e8de;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.modal-titulo {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.25rem;
+  color: #1c0f07;
+  margin: 0;
+}
+
+.modal-cerrar {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #7a5c4e;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.modal-cerrar:hover {
+  background: #f0e8de;
+  color: #1c0f07;
+}
+
+.modal-form {
+  padding: 20px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Preview imagen */
+.modal-img-preview-wrap {
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #f5f0ea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #d4b896;
+}
+
+.modal-img-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-img-placeholder {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.88rem;
+  color: #b09080;
+}
+
+/* File input */
+.modal-file-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.modal-file-input {
+  display: none;
+}
+
+.modal-file-btn {
+  background-color: #1c0f07;
+  color: #d4963a;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: 'Lato', sans-serif;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.modal-file-label:hover .modal-file-btn {
+  background-color: #c1440e;
+  color: #fff;
+}
+
+.modal-file-nombre {
+  font-size: 0.78rem;
+  color: #7a5c4e;
+  font-family: 'Lato', sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 210px;
+}
+
+/* Campos */
+.modal-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.modal-label {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #4a3028;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.modal-req { color: #c1440e; }
+
+.modal-input {
+  border: 1.5px solid #e0d4c8;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9rem;
+  color: #1c0f07;
+  outline: none;
+  transition: border-color 0.2s ease;
+  background: #fdfaf7;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-input:focus {
+  border-color: #d4963a;
+  background: #fff;
+}
+
+.modal-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-fila {
+  display: flex;
+  gap: 14px;
+}
+
+.modal-nota {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.75rem;
+  color: #a08070;
+  margin: 0;
+}
+
+.modal-btn-submit {
+  background-color: #c1440e;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  margin-top: 4px;
+}
+
+.modal-btn-submit:hover:not(:disabled) {
+  background-color: #a33509;
+  transform: translateY(-1px);
+}
+
+.modal-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+@media (max-width: 1100px) {
+  .carta-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .carta-wrapper { padding: 40px 20px 60px; }
+  .carta-titulo  { font-size: 2rem; }
+  .carta-grid    { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .modal-fila    { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .carta-titulo  { font-size: 1.7rem; }
+  .carta-grid    { grid-template-columns: 1fr; }
+  .plato-card__imagen-wrap { height: 220px; }
+  .carta-header__grid { grid-template-columns: 1fr 1fr; }
+  .carta-header__centro { grid-column: 1 / -1; order: -1; }
+}
