@@ -1,0 +1,224 @@
+.hero-parallax-wrapper {
+  position: relative;
+  width: 100%;
+  /* Asegura un espacio perfecto considerando el alto combinado del topbar y navbar */
+  height: calc(100vh - 150px); 
+  min-height: 550px;
+  /* Bloquea barras de desborde internas */
+  overflow: hidden !important; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #120904;
+}
+
+.parallax-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%; /* Le damos un 20% extra para que el efecto translate3d tenga margen abajo y no muestre fondo vacío */
+  z-index: 1;
+  will-change: transform;
+}
+
+.carrusel-slide-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;   
+  height: 100%;  
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;   
+  opacity: 0; 
+  /* Transición de opacidad suavizada */
+  transition: opacity 1.8s ease-in-out; 
+  /* CORREGIDO: Mismo z-index base para que el fundido sea limpio y sin saltos entre ciclos */
+  z-index: 2; 
+}
+
+.carrusel-slide-bg.active {
+  opacity: 1;
+}
+
+.vignette {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(to bottom, rgba(18, 9, 4, 0.3) 0%, rgba(18, 9, 4, 0.65) 100%),
+              radial-gradient(circle, transparent 40%, rgba(18, 9, 4, 0.75) 95%);
+  z-index: 4; 
+  pointer-events: none;
+}
+
+.glow-accent {
+  position: absolute;
+  bottom: 0; left: 0; width: 60%; height: 60%;
+  background: radial-gradient(circle, rgba(193, 68, 14, 0.18) 0%, transparent 70%);
+  filter: blur(50px);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.deco-line-h {
+  position: absolute;
+  left: 5%; width: 90%; height: 1px;
+  background: linear-gradient(90deg, transparent, #d4963a, transparent);
+  opacity: 0.2;
+  z-index: 6;
+}
+.deco-line-h.top { top: 40px; }
+.deco-line-h.bottom { bottom: 40px; }
+
+/* Partículas Doradas */
+.particles-layer {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 7;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.particle {
+  position: absolute;
+  width: 4px; height: 4px;
+  background-color: #d4963a; 
+  border-radius: 50%;
+  opacity: 0.35;
+  box-shadow: 0 0 8px #d4963a;
+}
+.p-0 { top: 15%; left: 10%; } .p-1 { top: 25%; left: 80%; width: 5px; height: 5px; }
+.p-2 { top: 70%; left: 15%; } .p-3 { top: 45%; left: 85%; }
+.p-4 { top: 80%; left: 75%; } .p-5 { top: 35%; left: 20%; }
+.p-6 { top: 10%; left: 60%; } .p-7 { top: 90%; left: 40%; width: 3px; height: 3px; }
+.p-8 { top: 55%; left: 50%; } .p-9 { top: 30%; left: 45%; }
+.p-10 { top: 65%; left: 90%; } .p-11 { top: 85%; left: 25%; }
+.p-12 { top: 40%; left: 5%; } .p-13 { top: 75%; left: 65%; }
+.p-14 { top: 20%; left: 35%; } .p-15 { top: 50%; left: 70%; }
+.p-16 { top: 60%; left: 30%; } .p-17 { top: 95%; left: 85%; }
+
+/* Bloque de Textos Centrales */
+.hero-content {
+  position: relative;
+  z-index: 10; 
+  text-align: center;
+  color: #f5ecd7;
+  max-width: 650px;
+  padding: 0 20px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1s ease, transform 1s ease;
+  will-change: transform, opacity;
+}
+
+.hero-content.is-loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-tagline {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.85rem;
+  letter-spacing: 5px;
+  color: #d4963a;
+  margin: 15px 0;
+  font-weight: 700;
+}
+
+.hero-title .title-main {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 4.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -1px;
+  line-height: 1;
+  text-shadow: 0 4px 25px rgba(0,0,0,0.85);
+}
+
+/* Responsivo para celulares para que el título grande no se desborde */
+@media (max-width: 600px) {
+  .hero-title .title-main {
+    font-size: 3.2rem;
+  }
+}
+
+.hero-subtitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.6rem;
+  font-style: italic;
+  color: #e2d3c5;
+  margin: 15px 0 35px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.deco-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: #d4963a;
+  opacity: 0.6;
+}
+.orn-line { width: 70px; height: 1px; background-color: #d4963a; }
+.orn-diamond { width: 6px; height: 6px; transform: rotate(45deg); background-color: #d4963a; }
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-hero-primary {
+  background-color: #c1440e;
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(193, 68, 14, 0.4);
+  transition: background 0.2s, transform 0.2s;
+}
+.btn-hero-primary:hover { background-color: #a33509; transform: translateY(-2px); }
+
+.btn-hero-ghost {
+  background: transparent;
+  border: 2px solid #ffffff;
+  color: white;
+  padding: 12px 32px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-hero-ghost:hover { background-color: #ffffff; color: #1c0f07; }
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #a0856a;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.scroll-arrow {
+  width: 1px; height: 30px;
+  background: linear-gradient(to bottom, #d4963a, transparent);
+  animation: scrollFloat 1.5s infinite ease-in-out;
+}
+
+@keyframes scrollFloat {
+  0% { height: 0; opacity: 0; }
+  50% { height: 30px; opacity: 1; }
+  100% { height: 30px; opacity: 0; transform: translateY(10px); }
+}

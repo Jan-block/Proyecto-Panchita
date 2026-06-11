@@ -1,0 +1,389 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;600&display=swap');
+ 
+:root {
+  --cafe-oscuro:    #1C0F07;
+  --cafe-panel:     #2C1608;
+  --cafe-medio:     #3D1E08;
+  --cafe-borde:     rgba(200, 140, 60, 0.2);
+  --dorado:         #D4963A;
+  --dorado-suave:   rgba(212, 150, 58, 0.6);
+  --terracota:      #C1440E;
+  --terracota-dark: #A33509;
+  --crema:          #F5ECD7;
+  --crema-input:    #FDF7EC;
+  --crema-borde:    #D9C9A8;
+  --crema-hint:     #C4A882;
+  --texto-cafe:     #3D1E08;
+  --texto-muted:    #A0856A;
+  --exito:          #276749;
+  --error-color:    #C1440E;
+  --error-bg:       #FDF0EB;
+  --error-borde:    #F0BBA8;
+  --sombra:         0 32px 80px rgba(0, 0, 0, 0.55), 0 4px 20px rgba(0, 0, 0, 0.3);
+  --transition:     0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --radius:         10px;
+}
+ 
+/* ── Reset encapsulado ── */
+.auth-wrapper *,
+.auth-wrapper *::before,
+.auth-wrapper *::after {
+  box-sizing: border-box;
+}
+ 
+/* ── Fondo de página ── */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: var(--cafe-oscuro);
+  background-image:
+    radial-gradient(ellipse at 15% 50%, rgba(139, 69, 19, 0.2) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 15%, rgba(180, 100, 40, 0.14) 0%, transparent 55%);
+  font-family: 'Lato', system-ui, sans-serif;
+}
+ 
+/* ── Caja principal ── */
+.auth-box {
+  width: 820px;
+  max-width: 100%;
+  min-height: 500px;
+  display: flex;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--sombra);
+  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+ 
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+ 
+/* ── Panel decorativo izquierdo ── */
+.auth-deco {
+  width: 42%;
+  flex-shrink: 0;
+  background: var(--cafe-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+  border-right: 1px solid var(--cafe-borde);
+}
+ 
+.deco-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 140, 60, 0.1);
+  pointer-events: none;
+}
+.deco-ring--1 { width: 300px; height: 300px; top: -90px;  right: -90px; }
+.deco-ring--2 { width: 220px; height: 220px; bottom: -70px; left: -70px; }
+ 
+.deco-content {
+  position: relative;
+  text-align: center;
+  z-index: 1;
+}
+ 
+.deco-logo {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: var(--dorado);
+  line-height: 1;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+ 
+.deco-sub {
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  color: var(--dorado-suave);
+  text-transform: uppercase;
+  margin: 0 0 2rem;
+}
+ 
+.deco-divider {
+  width: 48px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--dorado), transparent);
+  margin: 0 auto 2rem;
+}
+ 
+.deco-tagline {
+  font-size: 0.9rem;
+  color: rgba(255, 235, 200, 0.5);
+  line-height: 1.75;
+  max-width: 200px;
+  margin: 0 auto;
+}
+ 
+/* ── Panel del formulario ── */
+.auth-form-panel {
+  flex: 1;
+  background: var(--crema);
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem 2.25rem;
+}
+ 
+/* ── Tabs ── */
+.auth-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--crema-borde);
+  margin-bottom: 1.75rem;
+}
+ 
+.auth-tab {
+  flex: 1;
+  padding: 10px 8px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--texto-muted);
+  letter-spacing: 0.04em;
+  transition: color var(--transition), border-color var(--transition);
+}
+ 
+.auth-tab--active {
+  color: var(--texto-cafe);
+  border-bottom-color: var(--terracota);
+}
+ 
+/* ── Títulos del formulario ── */
+.auth-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--texto-cafe);
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+}
+ 
+.auth-hint {
+  font-size: 0.8125rem;
+  color: var(--texto-muted);
+  margin: 0 0 1.5rem;
+  line-height: 1.55;
+}
+ 
+/* ── Animación campo nombre ── */
+.name-slide {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.22s ease;
+}
+.name-slide--open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.name-slide__inner {
+  overflow: hidden;
+  padding-bottom: 10px;
+}
+ 
+/* ── Campo de entrada ── */
+.auth-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--crema-input);
+  border: 1px solid var(--crema-borde);
+  border-radius: var(--radius);
+  padding: 0 14px;
+  margin-bottom: 10px;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+ 
+.auth-field:focus-within {
+  border-color: var(--terracota);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(193, 68, 14, 0.12);
+}
+ 
+.auth-field__icon {
+  display: flex;
+  align-items: center;
+  color: var(--crema-hint);
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+ 
+.auth-field:focus-within .auth-field__icon {
+  color: var(--terracota);
+}
+ 
+.field-icon {
+  width: 16px;
+  height: 16px;
+}
+ 
+.auth-field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9375rem;
+  color: var(--texto-cafe);
+  padding: 13px 0;
+}
+ 
+.auth-field input::placeholder {
+  color: var(--crema-hint);
+}
+ 
+/* ── Error ── */
+.auth-error {
+  font-size: 0.8125rem;
+  color: var(--error-color);
+  background: var(--error-bg);
+  border: 1px solid var(--error-borde);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  margin: 4px 0 8px;
+  line-height: 1.45;
+}
+ 
+/* ── Botón principal ── */
+.btn-main {
+  width: 100%;
+  height: 48px;
+  margin-top: 10px;
+  background: var(--terracota);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transition: background var(--transition), transform 0.12s, opacity var(--transition);
+}
+ 
+.btn-main:hover:not(:disabled) {
+  background: var(--terracota-dark);
+}
+ 
+.btn-main:active:not(:disabled) {
+  transform: scale(0.985);
+}
+ 
+.btn-main:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+ 
+.btn-main--success {
+  background: var(--exito) !important;
+}
+ 
+/* ── Spinner ── */
+.spin {
+  animation: spin 0.75s linear infinite;
+}
+ 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+ 
+/* ── Ornamento ── */
+.auth-ornament {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 1.25rem 0 1rem;
+}
+ 
+.orn-line {
+  flex: 1;
+  height: 1px;
+  background: var(--crema-borde);
+}
+ 
+.orn-symbol {
+  font-size: 13px;
+  color: var(--crema-borde);
+  line-height: 1;
+}
+ 
+/* ── Toggle link ── */
+.auth-toggle {
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--texto-muted);
+  margin: 0;
+}
+ 
+.auth-toggle button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--terracota);
+  font-family: 'Lato', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0 2px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--transition);
+}
+ 
+.auth-toggle button:hover {
+  text-decoration-color: var(--terracota);
+}
+ 
+/* ── Responsive móvil ── */
+@media (max-width: 620px) {
+  .auth-box {
+    flex-direction: column;
+    border-radius: 16px;
+    min-height: unset;
+  }
+ 
+  .auth-deco {
+    width: 100%;
+    padding: 2rem 1.5rem;
+    border-right: none;
+    border-bottom: 1px solid var(--cafe-borde);
+  }
+ 
+  .deco-ring--1 { width: 200px; height: 200px; top: -60px; right: -60px; }
+  .deco-ring--2 { width: 150px; height: 150px; bottom: -50px; left: -50px; }
+  .deco-logo    { font-size: 2.1rem; }
+  .deco-tagline { font-size: 0.825rem; }
+ 
+  .auth-form-panel {
+    padding: 1.75rem 1.5rem 2rem;
+  }
+}
+
+.deco-image {
+  width: 350px;       
+  max-width: 90%;    
+  height: auto;       
+  margin: 20px auto; 
+  display: block;     
+  object-fit: contain;
+}

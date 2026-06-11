@@ -1,0 +1,180 @@
+/* ==========================================================================
+   PANEL CONTENEDOR DE LAS MESAS (GRID MAPA OPERATIVO)
+   ========================================================================== */
+.mesas-operativas-panel {
+  display: grid;
+  /* Mantiene un tamaño mínimo cómodo para que la cuadrícula sea armónica */
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   ESTRUCTURA DE LA TARJETA BASE
+   ========================================================================== */
+.mesa-card {
+  background: #ffffff;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1.5px solid transparent;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  width: 100%;
+}
+
+/* Efectos premium interactivos al pasar el mouse y hacer clic */
+.mesa-card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+}
+
+.mesa-card:active { 
+  transform: translateY(-1px); 
+}
+
+/* ==========================================================================
+   IMAGEN DE LA MESA Y EFECTOS VISUALES
+   ========================================================================== */
+.mesa-card__img-wrap {
+  position: relative;
+  width: 100%;
+  height: 130px; /* Altura ideal balanceada para vistas de mesas */
+  overflow: hidden;
+  background-color: #f1f5f9;
+}
+
+.mesa-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.mesa-card:hover .mesa-card__img {
+  transform: scale(1.06); /* Sutil zoom de la imagen */
+}
+
+.mesa-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.12); /* Capa oscura inicial para integrar la foto */
+  pointer-events: none;
+  transition: background 0.2s ease;
+}
+
+.mesa-card:hover .mesa-card__overlay {
+  background: rgba(0, 0, 0, 0.04); /* Se aclara en hover para resaltar la foto */
+}
+
+/* ==========================================================================
+   FOOTER REESTRUCTURADO (DOS FILAS - PREVIENE RECORTES)
+   ========================================================================== */
+.mesa-card__footer {
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 12px;
+  display: flex;
+  flex-direction: column; /* Apila las filas verticalmente */
+  gap: 8px; /* Separación balanceada entre la info y el badge */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Fila 1: Distribución horizontal del número y los asientos */
+.mesa-card__row-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Empuja el número a la izquierda y capacidad a la derecha */
+  width: 100%;
+}
+
+.mesa-card__numero {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.mesa-card__capacidad {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Fila 2: Bloque del Badge completo */
+.mesa-card__row-inferior {
+  width: 100%;
+}
+
+/* ==========================================================================
+   DISEÑO DEL BADGE DE ESTADO (ANCHO COMPLETO Y CENTRADO)
+   ========================================================================== */
+.mesa-card__badge {
+  display: block; /* Obliga al badge a expandirse en todo el ancho */
+  text-align: center; /* Centra perfectamente el texto */
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 0; /* Espaciado interno vertical ideal */
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   VARIANTES DE COLOR SEGÚN EL ESTADO DE LA BD
+   ========================================================================== */
+
+/* 🟢 ESTADO: DISPONIBLE / LIBRE */
+.mesa-card--disponible {
+  border-color: rgba(34, 197, 94, 0.25);
+}
+.mesa-card__badge--disponible {
+  background: #dcfce7;
+  color: #15803d;
+}
+.mesa-card--disponible:hover {
+  border-color: #22c55e;
+}
+
+/* 🔴 ESTADO: OCUPADA */
+.mesa-card--ocupada {
+  border-color: rgba(239, 68, 68, 0.25);
+}
+.mesa-card__badge--ocupada {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.mesa-card--ocupada:hover {
+  border-color: #ef4444;
+}
+
+/* 🟡 ESTADO: RESERVADA */
+.mesa-card--reservada {
+  border-color: rgba(234, 179, 8, 0.35);
+}
+.mesa-card__badge--reservada {
+  background: #fef9c3;
+  color: #a16207;
+}
+.mesa-card--reservada:hover {
+  border-color: #eab308;
+}
+.mesas-empty {
+  grid-column: 1 / -1;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.6;
+}
