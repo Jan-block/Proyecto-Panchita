@@ -4,7 +4,6 @@ import './NuestraCarta.css';
 const FORM_VACIO = { name: '', image: null, imagePreview: null, description: '', price: '', category: '' };
 
 export default function NuestraCarta({ usuarioLogueado }) {
-
   const [platos, setPlatos] = useState([]);
   const [categoriaActiva, setCategoriaActiva] = useState('Todos');
   const [modalAbierto, setModalAbierto] = useState(false);
