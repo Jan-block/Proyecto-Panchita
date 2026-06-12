@@ -9,7 +9,6 @@ import GestionDelivery from './Gestiondelibery';
 import NuestraCarta from './NuestraCarta.jsx';
 import GestionEstacionamiento from './GestionEstacionamiento';
 
-
 export default function AdminDashboard({ usuarioLogueado, onLogout }) {
   const [seccionActiva, setSeccionActiva] = useState('panel');
   const [cargando, setCargando] = useState(true);
@@ -196,18 +195,25 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
             🛵 Delivery
           </button>
           <button className="menu-item disabled-tab">📋 Historial</button>
-              <button 
+          <button
             className={`menu-item ${seccionActiva === 'estacionamiento' ? 'active' : ''}`}
             onClick={() => setSeccionActiva('estacionamiento')}
           >
             🚗 Estacionamiento
-              </button>
+          </button>
           <button className="menu-item disabled-tab">🚗 Estacionamiento</button>
           <button className={`menu-item ${seccionActiva === 'carta' ? 'active' : ''}`}
             onClick={() => setSeccionActiva('carta')}
           >
-            🍳 Platos / Carta</button>
-          <button className="menu-item disabled-tab">📊 Reportes</button>
+            🍳 Platos / Carta
+          </button>
+          {/* ── REPORTES: activado ── */}
+          <button
+            className={`menu-item ${seccionActiva === 'reportes' ? 'active' : ''}`}
+            onClick={() => setSeccionActiva('reportes')}
+          >
+            📊 Reportes
+          </button>
         </nav>
 
         {notificaciones.length > 0 && (
@@ -365,6 +371,45 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
           {seccionActiva === 'delivery' && <GestionDelivery />}
           {seccionActiva === 'carta' && <NuestraCarta usuarioLogueado={usuarioLogueado}/>}
           {seccionActiva === 'estacionamiento' && <GestionEstacionamiento />}
+
+          {/* ══ REPORTES ══ */}
+          {seccionActiva === 'reportes' && (
+            <div className="view-header">
+              <div className="view-header-top">
+                <div>
+                  <h1>📊 Reportes</h1>
+                  <p>Exporta la información del restaurante en formato Excel</p>
+                </div>
+              </div>
+
+              <div className="metrics-row-grid" style={{ marginTop: '24px' }}>
+                <div className="metric-card-premium">
+                  <div className="metric-header">
+                    <span>Reservas</span>
+                    <span className="badge-live">Excel</span>
+                  </div>
+                  <h2>📋</h2>
+                  <p>Exporta todas las reservas registradas</p>
+                  <button
+                    onClick={() => window.open('http://localhost:8080/api/reportes/reservas/excel', '_blank')}
+                    style={{
+                      marginTop: '12px',
+                      background: '#B8860B',
+                      color: 'white',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold',
+                      width: '100%'
+                    }}
+                  >
+                    📥 Descargar Excel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
       </main>
