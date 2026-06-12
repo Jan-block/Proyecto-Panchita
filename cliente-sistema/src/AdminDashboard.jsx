@@ -6,7 +6,10 @@ import MapaSalon from './MapaSalon.jsx';                       // ← NUEVO
 import { useNotificaciones } from './Usenotificaciones.js';  // ← NUEVO
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import GestionDelivery from './Gestiondelibery';
+<<<<<<< HEAD
 import GestionEstacionamiento from './GestionEstacionamiento';
+=======
+>>>>>>> 5d71d8da6bbaa920f4ab17341c5ced083400d088
 
 
 export default function AdminDashboard({ usuarioLogueado, onLogout }) {
@@ -195,12 +198,16 @@ const cargarDatosDashboard = useCallback(() => {
             🛵 Delivery
           </button>
           <button className="menu-item disabled-tab">📋 Historial</button>
+<<<<<<< HEAD
               <button 
             className={`menu-item ${seccionActiva === 'estacionamiento' ? 'active' : ''}`}
             onClick={() => setSeccionActiva('estacionamiento')}
           >
             🚗 Estacionamiento
               </button>
+=======
+          <button className="menu-item disabled-tab">🚗 Estacionamiento</button>
+>>>>>>> 5d71d8da6bbaa920f4ab17341c5ced083400d088
           <button className="menu-item disabled-tab">🍳 Platos / Carta</button>
           <button className="menu-item disabled-tab">📊 Reportes</button>
         </nav>
