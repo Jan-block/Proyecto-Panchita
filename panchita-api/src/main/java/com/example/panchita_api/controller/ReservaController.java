@@ -102,12 +102,9 @@ public class ReservaController {
         
         reservaDb.setEstadoReserva(reservaDetalles.getEstadoReserva());
         reservaDb.setObservaciones(reservaDetalles.getObservaciones());
-<<<<<<< HEAD
         reservaDb.setEstacionamiento(reservaDetalles.getEstacionamiento());
 
-=======
         
->>>>>>> 5d71d8da6bbaa920f4ab17341c5ced083400d088
         if (reservaDetalles.getMesa() != null) {
             Mesa mesaDb = mesaRepository.findById(reservaDetalles.getMesa().getId())
                     .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
