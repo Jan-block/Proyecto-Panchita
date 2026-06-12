@@ -26,7 +26,7 @@ public class CorsConfig {
         config.setAllowedHeaders(Arrays.asList("*"));
         
         // Métodos HTTP necesarios para tu API rest
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         
         // Registrar la configuración para todas las rutas del backend
         source.registerCorsConfiguration("/**", config);
