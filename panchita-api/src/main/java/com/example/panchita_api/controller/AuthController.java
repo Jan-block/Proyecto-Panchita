@@ -2,102 +2,141 @@ package com.example.panchita_api.controller;
 
 import com.example.panchita_api.model.Usuario;
 import com.example.panchita_api.repository.UsuarioRepository;
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    // ✅ LOGBACK: reemplaza todos los System.out.println
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private UsuarioRepository usuarioRepository;
-
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        String emailIngresado = credentials.get("email");
+        String emailIngresado   = credentials.get("email");
         String passwordIngresado = credentials.get("password");
 
-        // 🔴 LÍNEAS DE RASTREO: Verifican qué llega desde React
-        System.out.println(">>> REPETICIÓN RECIBIDA DESDE REACT <<<");
-        System.out.println("Email ingresado: [" + emailIngresado + "]");
-        System.out.println("Password ingresado: [" + passwordIngresado + "]");
+        // ✅ APACHE COMMONS: valida que no sean blancos
+        if (StringUtils.isBlank(emailIngresado) || StringUtils.isBlank(passwordIngresado)) {
+            log.warn("Intento de login con campos vacíos");
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Email y contraseña son obligatorios."));
+        }
+
+        // ✅ APACHE COMMONS VALIDATOR: valida formato de email
+        if (!EmailValidator.getInstance().isValid(emailIngresado)) {
+            log.warn("Formato de email inválido: {}", emailIngresado);
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "El formato del email no es válido."));
+        }
+
+        log.info("Intento de login para: {}", emailIngresado);
 
         Optional<Usuario> usuarioOpt = usuarioRepository.findByCorreo(emailIngresado);
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            
-            // 🔴 LÍNEAS DE RASTREO: Verifican qué leyó desde MySQL Workbench
-            System.out.println(">>> USUARIO ENCONTRADO EN MYSQL <<<");
-            System.out.println("Password en Base de Datos: [" + usuario.getPassword() + "]");
-            System.out.println("Estado del usuario: [" + usuario.getEstado() + "]");
 
-            if (usuario.getPassword().equals(passwordIngresado)) {
+            if (passwordEncoder.matches(passwordIngresado, usuario.getPassword())) {
                 if ("inactivo".equals(usuario.getEstado())) {
+                    log.warn("Usuario inactivo intentó acceder: {}", emailIngresado);
                     return ResponseEntity.status(HttpStatus.FORBIDDEN)
                             .body(Map.of("message", "Tu cuenta está desactivada."));
                 }
 
+                log.info("Login exitoso para: {} con rol: {}", emailIngresado, usuario.getRol());
+
                 Map<String, String> respuesta = new HashMap<>();
-                respuesta.put("id", String.valueOf(usuario.getId())); // 🌟 AGREGA ESTA LÍNEA
+                respuesta.put("id",      String.valueOf(usuario.getId()));
                 respuesta.put("mensaje", "¡Bienvenido de vuelta!");
-                respuesta.put("nombre", usuario.getNombre());
-                respuesta.put("rol", usuario.getRol());
-                respuesta.put("token", "jwt-token-panchita-real");
+                respuesta.put("nombre",  usuario.getNombre());
+                respuesta.put("rol",     usuario.getRol());
+                respuesta.put("token",   "jwt-token-panchita-real");
                 return ResponseEntity.ok(respuesta);
-            } else {
-                System.out.println("❌ LA CONTRASEÑA NO COINCIDIÓ");
             }
-        } else {
-            System.out.println("❌ EL CORREO NO EXISTE EN LA BASE DE DATOS");
         }
 
-        Map<String, String> errorRespuesta = new HashMap<>();
-        errorRespuesta.put("message", "Correo o contraseña incorrectos.");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorRespuesta);
+        log.warn("Credenciales incorrectas para: {}", emailIngresado);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Correo o contraseña incorrectos."));
     }
 
     @PostMapping("/register")
-public ResponseEntity<?> register(@RequestBody Map<String, String> userData) {
-    try {
-        // ... (tu lógica de validación de correo existente)
+    public ResponseEntity<?> register(@RequestBody Map<String, String> userData) {
+        try {
+            String nombre   = userData.get("nombre");
+            String email    = userData.get("email");
+            String password = userData.get("password");
+            String telefono = userData.get("telefono");
 
-        Usuario nuevoUsuario = new Usuario();
-        nuevoUsuario.setNombre(userData.get("nombre"));
-        nuevoUsuario.setCorreo(userData.get("email"));
-        nuevoUsuario.setPassword(userData.get("password"));
-        nuevoUsuario.setTelefono(userData.get("telefono"));
-        nuevoUsuario.setEstado("activo");
+            // ✅ APACHE COMMONS: valida campos obligatorios
+            if (StringUtils.isAnyBlank(nombre, email, password)) {
+                log.warn("Registro con campos obligatorios vacíos");
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Nombre, email y contraseña son obligatorios."));
+            }
 
-        if ("PANCHITA2026".equals(userData.get("codigoSecreto"))) {
-            nuevoUsuario.setRol("administrador");
-        } else {
-            nuevoUsuario.setRol("cliente");
+            // ✅ APACHE COMMONS VALIDATOR: valida email
+            if (!EmailValidator.getInstance().isValid(email)) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "El formato del email no es válido."));
+            }
+
+            // ✅ GUAVA: valida longitud mínima de contraseña
+            Preconditions.checkArgument(password.length() >= 6,
+                    "La contraseña debe tener al menos 6 caracteres");
+
+            // Verifica si el correo ya existe
+            if (usuarioRepository.findByCorreo(email).isPresent()) {
+                log.warn("Intento de registro con email ya existente: {}", email);
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(Map.of("message", "Ya existe una cuenta con ese correo."));
+            }
+
+            Usuario nuevoUsuario = new Usuario();
+            nuevoUsuario.setNombre(StringUtils.trimToEmpty(nombre));
+            nuevoUsuario.setCorreo(email.toLowerCase());
+            nuevoUsuario.setPassword(passwordEncoder.encode(password));
+            nuevoUsuario.setTelefono(StringUtils.trimToEmpty(telefono));
+            nuevoUsuario.setEstado("activo");
+            nuevoUsuario.setRol("PANCHITA2026".equals(userData.get("codigoSecreto"))
+                    ? "administrador" : "cliente");
+
+            Usuario guardado = usuarioRepository.save(nuevoUsuario);
+            log.info("Usuario registrado exitosamente: {} con rol: {}", email, guardado.getRol());
+
+            return ResponseEntity.ok(Map.of(
+                    "id",      guardado.getId(),
+                    "mensaje", "¡Cuenta creada exitosamente!",
+                    "nombre",  guardado.getNombre(),
+                    "rol",     guardado.getRol()
+            ));
+
+        } catch (IllegalArgumentException e) {
+            log.error("Error de validación en registro: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error inesperado en registro", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error al procesar el registro."));
         }
-
-        // Guardamos y obtenemos el usuario con el ID ya generado por MySQL
-        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
-
-        // RESPUESTA EXITOSA CON EL ID
-        Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("id", usuarioGuardado.getId()); // ¡Esto soluciona el ERROR CRÍTICO!
-        respuesta.put("mensaje", "¡Cuenta creada exitosamente!");
-        respuesta.put("nombre", usuarioGuardado.getNombre());
-        respuesta.put("rol", usuarioGuardado.getRol());
-        
-        return ResponseEntity.ok(respuesta);
-
-    } catch (Exception e) {
-        // Esto captura por qué da error 400 (ej. algún campo nulo que no debe serlo)
-        e.printStackTrace(); 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                             .body(Map.of("message", "Error al procesar el registro: " + e.getMessage()));
     }
-}
 }
