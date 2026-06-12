@@ -201,7 +201,6 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
           >
             🚗 Estacionamiento
           </button>
-          <button className="menu-item disabled-tab">🚗 Estacionamiento</button>
           <button className={`menu-item ${seccionActiva === 'carta' ? 'active' : ''}`}
             onClick={() => setSeccionActiva('carta')}
           >
