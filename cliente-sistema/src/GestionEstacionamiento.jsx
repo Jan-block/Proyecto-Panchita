@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './GestionEstacionamiento.css';
 
 const ESTADOS = {
-  LIBRE:    { label: 'Libre',    clase: 'espacio-libre',    icono: '🅿️' },
-  OCUPADO:  { label: 'Ocupado',  clase: 'espacio-ocupado',  icono: '🚗' },
+  LIBRE:     { label: 'Libre',     clase: 'espacio-libre',     icono: '🅿️' },
+  RESERVADO: { label: 'Reservado', clase: 'espacio-reservado', icono: '🟡' },
+  OCUPADO:   { label: 'Ocupado',   clase: 'espacio-ocupado',   icono: '🚗' },
 };
 
 const minutosOcupado = (fechaEntrada) => {
@@ -22,28 +23,36 @@ export default function GestionEstacionamiento() {
   const [modalRegistro, setModalRegistro] = useState(null);
   const [cargando, setCargando]           = useState(true);
 
-  // Inicializar espacios
   const inicializarEspacios = useCallback((reservasData) => {
-    const espaciosOcupados = reservasData
-      .filter(r => r.estacionamiento === 1 || r.estacionamiento === true)
-      .map(r => ({
-        reservaId: r.id,
-        codigoReserva: r.codigoReserva,
-        cliente: r.usuario?.nombre || 'Cliente',
-        fechaEntrada: r.updatedAt || r.createdAt,
-      }));
+    // estacionamiento: 0 = libre, 1 = reservado (llegará), 2 = ocupado (ya llegó)
+    const reservadas  = reservasData.filter(r => r.estacionamiento === 1);
+    const ocupadas    = reservasData.filter(r => r.estacionamiento === 2);
 
     const nuevosEspacios = Array.from({ length: TOTAL_ESPACIOS }, (_, i) => {
-      const ocupado = espaciosOcupados[i];
-      return {
-        id: i + 1,
-        numero: i + 1,
-        estado: ocupado ? 'OCUPADO' : 'LIBRE',
-        reservaId: ocupado?.reservaId || null,
-        codigoReserva: ocupado?.codigoReserva || null,
-        cliente: ocupado?.cliente || null,
-        fechaEntrada: ocupado?.fechaEntrada || null,
-      };
+      const ocupado   = ocupadas[i - (reservadas.length > i ? 0 : 0)];
+      const reservado = reservadas[i];
+
+      // Primero llenamos ocupados, luego reservados
+      const ocup = ocupadas[i] || null;
+      const res  = !ocup ? reservadas[i - ocupadas.length] || null : null;
+
+      if (ocup) {
+        return {
+          id: i + 1, numero: i + 1, estado: 'OCUPADO',
+          reservaId: ocup.id, codigoReserva: ocup.codigoReserva,
+          cliente: ocup.usuario?.nombre || 'Cliente',
+          fechaEntrada: ocup.updatedAt || ocup.createdAt,
+        };
+      } else if (res) {
+        return {
+          id: i + 1, numero: i + 1, estado: 'RESERVADO',
+          reservaId: res.id, codigoReserva: res.codigoReserva,
+          cliente: res.usuario?.nombre || 'Cliente',
+          fechaEntrada: null,
+        };
+      } else {
+        return { id: i + 1, numero: i + 1, estado: 'LIBRE', reservaId: null, codigoReserva: null, cliente: null, fechaEntrada: null };
+      }
     });
 
     setEspacios(nuevosEspacios);
@@ -55,77 +64,77 @@ export default function GestionEstacionamiento() {
     fetch('http://localhost:8080/api/reservas')
       .then(r => r.json())
       .then(data => {
-        setReservas(Array.isArray(data) ? data : []);
-        inicializarEspacios(Array.isArray(data) ? data : []);
+        const arr = Array.isArray(data) ? data : [];
+        setReservas(arr);
+        inicializarEspacios(arr);
       })
-      .catch(() => {
-        setReservas([]);
-        inicializarEspacios([]);
-      });
+      .catch(() => { setReservas([]); inicializarEspacios([]); });
   }, [inicializarEspacios]);
 
   useEffect(() => { cargarReservas(); }, [cargarReservas]);
 
   const conteo = {
-    LIBRE:   espacios.filter(e => e.estado === 'LIBRE').length,
-    OCUPADO: espacios.filter(e => e.estado === 'OCUPADO').length,
+    LIBRE:     espacios.filter(e => e.estado === 'LIBRE').length,
+    RESERVADO: espacios.filter(e => e.estado === 'RESERVADO').length,
+    OCUPADO:   espacios.filter(e => e.estado === 'OCUPADO').length,
   };
 
-  const espaciosFiltrados = filtro === 'TODOS'
-    ? espacios
-    : espacios.filter(e => e.estado === filtro);
+  const espaciosFiltrados = filtro === 'TODOS' ? espacios : espacios.filter(e => e.estado === filtro);
 
-  // Registrar entrada — marca estacionamiento=1 en la reserva
-  const registrarEntrada = (espacioId, reserva) => {
-    fetch(`http://localhost:8080/api/reservas/${reserva.id}`, {
+  // Actualizar estacionamiento en backend
+  const actualizarEstacionamiento = async (reservaId, valor) => {
+    // El endpoint GET individual no existe; buscamos la reserva en la lista completa
+    const res = await fetch('http://localhost:8080/api/reservas');
+    const todas = await res.json();
+    const reserva = todas.find(r => r.id === reservaId);
+    if (!reserva) throw new Error('Reserva no encontrada');
+    await fetch(`http://localhost:8080/api/reservas/${reservaId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...reserva, estacionamiento: 1 }),
-    })
-      .then(() => {
-        setEspacios(prev => prev.map(e =>
-          e.id === espacioId
-            ? { ...e, estado: 'OCUPADO', reservaId: reserva.id, codigoReserva: reserva.codigoReserva, cliente: reserva.usuario?.nombre || 'Cliente', fechaEntrada: new Date().toISOString() }
-            : e
-        ));
-        setModalRegistro(null);
-      })
-      .catch(() => alert('No se pudo registrar la entrada.'));
+      body: JSON.stringify({ ...reserva, estacionamiento: valor }),
+    });
   };
 
-  // Registrar salida — marca estacionamiento=0
-  const registrarSalida = (espacio) => {
-    fetch(`http://localhost:8080/api/reservas/${espacio.reservaId}`)
-      .then(r => r.json())
-      .then(reserva => {
-        return fetch(`http://localhost:8080/api/reservas/${espacio.reservaId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...reserva, estacionamiento: 0 }),
-        });
-      })
-      .then(() => {
-        setEspacios(prev => prev.map(e =>
-          e.id === espacio.id
-            ? { ...e, estado: 'LIBRE', reservaId: null, codigoReserva: null, cliente: null, fechaEntrada: null }
-            : e
-        ));
-        setEspacioActivo(null);
-      })
-      .catch(() => alert('No se pudo registrar la salida.'));
+  // Cliente llega → RESERVADO a OCUPADO
+  const registrarLlegada = async (espacio) => {
+    try {
+      await actualizarEstacionamiento(espacio.reservaId, 2);
+      setEspacios(prev => prev.map(e =>
+        e.id === espacio.id ? { ...e, estado: 'OCUPADO', fechaEntrada: new Date().toISOString() } : e
+      ));
+      setEspacioActivo(null);
+    } catch { alert('No se pudo registrar la llegada.'); }
   };
 
-  // Reservas disponibles (sin estacionamiento aún)
-  const reservasDisponibles = reservas.filter(r => !r.estacionamiento || r.estacionamiento === 0);
+  // Registrar salida → OCUPADO a LIBRE
+  const registrarSalida = async (espacio) => {
+    try {
+      await actualizarEstacionamiento(espacio.reservaId, 0);
+      setEspacios(prev => prev.map(e =>
+        e.id === espacio.id ? { ...e, estado: 'LIBRE', reservaId: null, codigoReserva: null, cliente: null, fechaEntrada: null } : e
+      ));
+      setEspacioActivo(null);
+    } catch { alert('No se pudo registrar la salida.'); }
+  };
+
+  // Espacio libre sin reserva → OCUPADO directo
+  const registrarEntradaSinReserva = async (espacioId, datos) => {
+    setEspacios(prev => prev.map(e =>
+      e.id === espacioId
+        ? { ...e, estado: 'OCUPADO', codigoReserva: null, cliente: datos.cliente || 'Sin reserva', placa: datos.placa, fechaEntrada: new Date().toISOString() }
+        : e
+    ));
+    setModalRegistro(null);
+  };
+
+  const reservasLibres = reservas.filter(r => !r.estacionamiento || r.estacionamiento === 0);
 
   return (
     <div className="estacionamiento-container">
       <div className="estacionamiento-header">
         <div>
           <h1 className="estacionamiento-titulo">🚗 Estacionamiento</h1>
-          <p className="estacionamiento-subtitulo">
-            Vista en tiempo real · {TOTAL_ESPACIOS} espacios en total
-          </p>
+          <p className="estacionamiento-subtitulo">Vista en tiempo real · {TOTAL_ESPACIOS} espacios en total</p>
         </div>
         <button className="btn-refresh" onClick={cargarReservas}>↻ Actualizar</button>
       </div>
@@ -137,6 +146,11 @@ export default function GestionEstacionamiento() {
           <span className="resumen-numero">{conteo.LIBRE}</span>
           <span className="resumen-label">Libres</span>
         </div>
+        <div className="resumen-card resumen-reservado">
+          <span className="resumen-icono">🟡</span>
+          <span className="resumen-numero">{conteo.RESERVADO}</span>
+          <span className="resumen-label">Reservados</span>
+        </div>
         <div className="resumen-card resumen-ocupado">
           <span className="resumen-icono">🔴</span>
           <span className="resumen-numero">{conteo.OCUPADO}</span>
@@ -147,9 +161,10 @@ export default function GestionEstacionamiento() {
       {/* Filtros */}
       <div className="estacionamiento-filtros">
         {[
-          { key: 'TODOS',   label: 'Todos',    count: espacios.length },
-          { key: 'LIBRE',   label: 'Libres',   count: conteo.LIBRE },
-          { key: 'OCUPADO', label: 'Ocupados', count: conteo.OCUPADO },
+          { key: 'TODOS',     label: 'Todos',      count: espacios.length },
+          { key: 'LIBRE',     label: 'Libres',     count: conteo.LIBRE },
+          { key: 'RESERVADO', label: 'Reservados', count: conteo.RESERVADO },
+          { key: 'OCUPADO',   label: 'Ocupados',   count: conteo.OCUPADO },
         ].map(({ key, label, count }) => (
           <button
             key={key}
@@ -169,8 +184,8 @@ export default function GestionEstacionamiento() {
       ) : (
         <div className="espacios-grid">
           {espaciosFiltrados.map((espacio) => {
-            const cfg  = ESTADOS[espacio.estado];
-            const mins = minutosOcupado(espacio.fechaEntrada);
+            const cfg    = ESTADOS[espacio.estado];
+            const mins   = minutosOcupado(espacio.fechaEntrada);
             const urgente = espacio.estado === 'OCUPADO' && mins !== null && mins >= 120;
 
             return (
@@ -181,15 +196,9 @@ export default function GestionEstacionamiento() {
               >
                 <span className="espacio-icono">{cfg.icono}</span>
                 <span className="espacio-numero">#{espacio.numero}</span>
-                {espacio.codigoReserva && (
-                  <span className="espacio-codigo">{espacio.codigoReserva}</span>
-                )}
-                {espacio.cliente && (
-                  <span className="espacio-cliente">{espacio.cliente}</span>
-                )}
-                <span className={`espacio-estado-label estado-${espacio.estado.toLowerCase()}`}>
-                  {cfg.label}
-                </span>
+                {espacio.codigoReserva && <span className="espacio-codigo">{espacio.codigoReserva}</span>}
+                {espacio.cliente && <span className="espacio-cliente">{espacio.cliente}</span>}
+                <span className={`espacio-estado-label estado-${espacio.estado.toLowerCase()}`}>{cfg.label}</span>
                 {mins !== null && (
                   <span className={`espacio-tiempo ${urgente ? 'tiempo-urgente' : ''}`}>
                     {mins}min {urgente ? '⚠' : ''}
@@ -201,30 +210,29 @@ export default function GestionEstacionamiento() {
         </div>
       )}
 
-      {/* Modal detalle */}
       {espacioActivo && (
         <ModalDetalle
           espacio={espacioActivo}
           onCerrar={() => setEspacioActivo(null)}
+          onLlegada={registrarLlegada}
           onSalida={registrarSalida}
         />
       )}
 
-      {/* Modal entrada */}
       {modalRegistro && (
-        <ModalEntrada
+        <ModalEntradaSinReserva
           espacio={modalRegistro}
-          reservas={reservasDisponibles}
           onCerrar={() => setModalRegistro(null)}
-          onConfirmar={registrarEntrada}
+          onConfirmar={registrarEntradaSinReserva}
         />
       )}
     </div>
   );
 }
 
-function ModalDetalle({ espacio, onCerrar, onSalida }) {
+function ModalDetalle({ espacio, onCerrar, onLlegada, onSalida }) {
   const mins = minutosOcupado(espacio.fechaEntrada);
+  const cfg  = ESTADOS[espacio.estado];
 
   return (
     <div className="modal-overlay" onClick={onCerrar}>
@@ -232,7 +240,9 @@ function ModalDetalle({ espacio, onCerrar, onSalida }) {
         <div className="modal-header">
           <div>
             <h2 className="modal-titulo">Espacio #{espacio.numero}</h2>
-            <span className="modal-estado-badge estado-ocupado">🚗 Ocupado</span>
+            <span className={`modal-estado-badge estado-${espacio.estado.toLowerCase()}`}>
+              {cfg.icono} {cfg.label}
+            </span>
           </div>
           <button className="modal-cerrar" onClick={onCerrar}>✕</button>
         </div>
@@ -267,23 +277,25 @@ function ModalDetalle({ espacio, onCerrar, onSalida }) {
           )}
         </div>
         <div className="modal-acciones">
-          <button className="btn-salida" onClick={() => onSalida(espacio)}>
-            🚗 Registrar Salida
-          </button>
+          {espacio.estado === 'RESERVADO' && (
+            <button className="btn-llegada" onClick={() => onLlegada(espacio)}>
+              ✅ Cliente llegó — Registrar entrada
+            </button>
+          )}
+          {espacio.estado === 'OCUPADO' && (
+            <button className="btn-salida" onClick={() => onSalida(espacio)}>
+              🚗 Registrar Salida
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function ModalEntrada({ espacio, reservas, onCerrar, onConfirmar }) {
-  const [busqueda, setBusqueda]           = useState('');
-  const [reservaSeleccionada, setReserva] = useState(null);
-
-  const reservasFiltradas = reservas.filter(r =>
-    r.codigoReserva?.toLowerCase().includes(busqueda.toLowerCase()) ||
-    r.usuario?.nombre?.toLowerCase().includes(busqueda.toLowerCase())
-  );
+function ModalEntradaSinReserva({ espacio, onCerrar, onConfirmar }) {
+  const [placa, setPlaca]     = useState('');
+  const [cliente, setCliente] = useState('');
 
   return (
     <div className="modal-overlay" onClick={onCerrar}>
@@ -296,45 +308,17 @@ function ModalEntrada({ espacio, reservas, onCerrar, onConfirmar }) {
           <button className="modal-cerrar" onClick={onCerrar}>✕</button>
         </div>
         <div className="modal-body">
-          <p className="modal-subtitulo">Busca la reserva del cliente</p>
+          <p className="modal-subtitulo">Cliente sin reserva previa</p>
           <div className="modal-campo-input">
-            <label>Código de reserva o nombre</label>
-            <input
-              type="text"
-              placeholder="Ej: RES-001 o Juan Pérez"
-              value={busqueda}
-              onChange={e => { setBusqueda(e.target.value); setReserva(null); }}
-              className="input-campo"
-            />
+            <label>Placa del vehículo *</label>
+            <input type="text" placeholder="Ej: ABC-123" value={placa}
+              onChange={e => setPlaca(e.target.value)} className="input-campo" maxLength={8} />
           </div>
-
-          {/* Lista de reservas */}
-          {busqueda && (
-            <div className="reservas-lista">
-              {reservasFiltradas.length === 0 ? (
-                <p className="reservas-vacio">No se encontraron reservas</p>
-              ) : (
-                reservasFiltradas.map(r => (
-                  <button
-                    key={r.id}
-                    className={`reserva-item ${reservaSeleccionada?.id === r.id ? 'reserva-seleccionada' : ''}`}
-                    onClick={() => setReserva(r)}
-                  >
-                    <span className="reserva-codigo">{r.codigoReserva}</span>
-                    <span className="reserva-cliente">{r.usuario?.nombre || 'Sin nombre'}</span>
-                    <span className="reserva-hora">{r.hora} — {r.fecha}</span>
-                  </button>
-                ))
-              )}
-            </div>
-          )}
-
-          {reservaSeleccionada && (
-            <div className="reserva-confirmada">
-              ✅ Reserva seleccionada: <strong>{reservaSeleccionada.codigoReserva}</strong> — {reservaSeleccionada.usuario?.nombre}
-            </div>
-          )}
-
+          <div className="modal-campo-input">
+            <label>Nombre del cliente (opcional)</label>
+            <input type="text" placeholder="Ej: Juan Pérez" value={cliente}
+              onChange={e => setCliente(e.target.value)} className="input-campo" />
+          </div>
           <div className="modal-fila">
             <span className="modal-campo">Hora entrada</span>
             <span className="modal-valor">
@@ -344,10 +328,10 @@ function ModalEntrada({ espacio, reservas, onCerrar, onConfirmar }) {
         </div>
         <div className="modal-acciones">
           <button className="btn-cancelar" onClick={onCerrar}>Cancelar</button>
-          <button
-            className="btn-entrada"
-            onClick={() => reservaSeleccionada ? onConfirmar(espacio.id, reservaSeleccionada) : alert('Selecciona una reserva')}
-          >
+          <button className="btn-entrada" onClick={() => {
+            if (!placa.trim()) { alert('Ingresa la placa'); return; }
+            onConfirmar(espacio.id, { placa: placa.toUpperCase(), cliente });
+          }}>
             ✅ Confirmar Entrada
           </button>
         </div>

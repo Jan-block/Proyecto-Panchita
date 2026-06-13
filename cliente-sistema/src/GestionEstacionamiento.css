@@ -463,3 +463,19 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* ── BOTÓN LLEGADA ───────────────────────────────────────────────────────── */
+.btn-llegada {
+  background: #fff8e1;
+  color: #e65100;
+  border: 1.5px solid #ffe0b2;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.btn-llegada:hover { background: #ffe0b2; }
