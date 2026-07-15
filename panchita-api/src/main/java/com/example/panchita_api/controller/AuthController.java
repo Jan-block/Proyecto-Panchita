@@ -2,12 +2,14 @@ package com.example.panchita_api.controller;
 
 import com.example.panchita_api.model.Usuario;
 import com.example.panchita_api.repository.UsuarioRepository;
+import com.example.panchita_api.security.JwtUtil;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +30,15 @@ public class AuthController {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    // Antes estaba escrito directamente en el código ("PANCHITA2026").
+    // Ahora viene de application.properties (app.admin.secret-code) y, en producción,
+    // debería venir de una variable de entorno.
+    @Value("${app.admin.secret-code}")
+    private String codigoSecretoAdmin;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
         String emailIngresado   = credentials.get("email");
@@ -63,12 +74,14 @@ public class AuthController {
 
                 log.info("Login exitoso para: {} con rol: {}", emailIngresado, usuario.getRol());
 
+                String token = jwtUtil.generarToken(usuario.getCorreo(), usuario.getRol());
+
                 Map<String, String> respuesta = new HashMap<>();
                 respuesta.put("id",      String.valueOf(usuario.getId()));
                 respuesta.put("mensaje", "¡Bienvenido de vuelta!");
                 respuesta.put("nombre",  usuario.getNombre());
                 respuesta.put("rol",     usuario.getRol());
-                respuesta.put("token",   "jwt-token-panchita-real");
+                respuesta.put("token",   token);
                 return ResponseEntity.ok(respuesta);
             }
         }
@@ -116,7 +129,7 @@ public class AuthController {
             nuevoUsuario.setPassword(passwordEncoder.encode(password));
             nuevoUsuario.setTelefono(StringUtils.trimToEmpty(telefono));
             nuevoUsuario.setEstado("activo");
-            nuevoUsuario.setRol("PANCHITA2026".equals(userData.get("codigoSecreto"))
+            nuevoUsuario.setRol(codigoSecretoAdmin.equals(userData.get("codigoSecreto"))
                     ? "administrador" : "cliente");
 
             Usuario guardado = usuarioRepository.save(nuevoUsuario);

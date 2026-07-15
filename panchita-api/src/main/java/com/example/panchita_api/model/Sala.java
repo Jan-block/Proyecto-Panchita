@@ -23,10 +23,8 @@ public class Sala {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    // Constructor vacío exigido por JPA
     public Sala() {}
 
-    // Getters y Setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 

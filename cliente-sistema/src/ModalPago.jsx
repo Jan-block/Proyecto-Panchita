@@ -71,7 +71,7 @@ export default function ModalPago({ isOpen, onClose, metodoPago, montoGarantia, 
                 Escanea este QR para transferir tu garantía al <strong>987 654 321</strong>.
               </p>
       
-              {/* 🔄 REEMPLAZADO POR GENERADOR NATIVO LOCAL */}
+              
               <div className="qr-box" style={{ display: 'flex', justifyContent: 'center', margin: '15px 0' }}>
                 <QRCodeSVG 
                   value="https://panchita.pe" 

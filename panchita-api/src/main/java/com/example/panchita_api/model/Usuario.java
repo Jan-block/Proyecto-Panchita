@@ -23,7 +23,7 @@ public class Usuario {
     @Column(length = 15)
     private String telefono;
 
-    // 🌟 Eliminamos columnDefinition para evitar que Hibernate pelee con el ENUM de MySQL
+
     @Column(length = 50)
     private String rol; 
 
@@ -33,7 +33,7 @@ public class Usuario {
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // Constructor vacío exigido por JPA
+    // Constructor vacío 
     public Usuario() {}
 
     // Métodos Getter y Setter

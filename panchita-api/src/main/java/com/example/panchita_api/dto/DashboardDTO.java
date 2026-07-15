@@ -10,7 +10,6 @@ public class DashboardDTO {
     private int[] flujoHorarios;
     private long mesasOcupadas;
     private long mesasTotales;
-    // NUEVOS: para comparativa vs. ayer
     private BigDecimal ingresosDiaAnterior;
     private long reservasAyer;
 
@@ -28,7 +27,6 @@ public class DashboardDTO {
         this.reservasAyer         = reservasAyer;
     }
 
-    // Getters y Setters existentes
     public BigDecimal getIngresosDia()                    { return ingresosDia; }
     public void setIngresosDia(BigDecimal ingresosDia)    { this.ingresosDia = ingresosDia; }
 
@@ -50,7 +48,6 @@ public class DashboardDTO {
     public long getMesasTotales()                         { return mesasTotales; }
     public void setMesasTotales(long mesasTotales)        { this.mesasTotales = mesasTotales; }
 
-    // Nuevos getters y setters para comparativa
     public BigDecimal getIngresosDiaAnterior()                           { return ingresosDiaAnterior; }
     public void setIngresosDiaAnterior(BigDecimal ingresosDiaAnterior)   { this.ingresosDiaAnterior = ingresosDiaAnterior; }
 

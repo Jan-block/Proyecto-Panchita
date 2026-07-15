@@ -42,7 +42,6 @@ public class MesaController {
 
             List<Map<String, Object>> resultado = todasLasMesas.stream().map(mesa -> {
 
-                // 1. Filtrado dinámico relacional considerando la duración por capacidad e ignorando finalizadas
                 Optional<Reserva> reservaEncontrada = reservasDelDia.stream()
                     .filter(r -> r.getMesa() != null
                               && r.getMesa().getId().equals(mesa.getId())
@@ -74,7 +73,6 @@ public class MesaController {
                     estadoCalculado = mesa.getEstado() != null ? mesa.getEstado().toLowerCase() : "disponible";
                 }
 
-                // 2. Extraer el ID real de la sala desde la base de datos relacional
                 Integer salaId = null;
                 String salaNombre = null;
                 if (mesa.getSala() != null) {
@@ -82,7 +80,6 @@ public class MesaController {
                     salaNombre = mesa.getSala().getNombre();
                 }
 
-                // Armar el mapa de respuesta enriquecido garantizando la consistencia de tipos
                 Map<String, Object> item = new LinkedHashMap<>();
                 item.put("id",         mesa.getId());
                 item.put("numero",     mesa.getNumero());
@@ -92,7 +89,6 @@ public class MesaController {
                 item.put("salaId",     salaId);
                 item.put("salaNombre", salaNombre); 
 
-                // INYECCIÓN ASEGURADA: Mapeamos los datos de la reserva directo para que React los reciba
                 if (reservaEncontrada.isPresent()) {
                     Reserva r = reservaEncontrada.get();
                     String nombreCliente = (r.getUsuario() != null) ? r.getUsuario().getNombre() : "Cliente";
@@ -141,7 +137,6 @@ public class MesaController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // ─── GET /api/mesas ──────────────────────────────────────────────────────
     @GetMapping
     public ResponseEntity<List<Mesa>> obtenerMesas() {
         List<Mesa> mesas = mesaRepository.findAll();
@@ -151,16 +146,12 @@ public class MesaController {
         return ResponseEntity.ok(mesas);
     }
 
-    // ─── POST /api/mesas ─────────────────────────────────────────────────────
     @PostMapping
     public ResponseEntity<?> crearMesa(@RequestBody Mesa mesa) {
         if (mesa.getEstado() == null) mesa.setEstado("disponible");
         return ResponseEntity.ok(mesaRepository.save(mesa));
     }
 
-    // Agrega este método a tu MesaController.java existente
-
-// 🗑️ DELETE: Eliminar una mesa por ID
 @DeleteMapping("/{id}")
 public ResponseEntity<?> eliminarMesa(@PathVariable Integer id) {
     try {

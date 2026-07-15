@@ -34,8 +34,7 @@ public class DashboardController {
             LocalDateTime finHoy      = hoy.atTime(LocalTime.MAX);
             LocalDateTime inicioAyer  = ayer.atStartOfDay();
             LocalDateTime finAyer     = ayer.atTime(LocalTime.MAX);
-
-            // 1. INGRESOS POR RESERVAS (hoy)
+            
             Object resReservas = entityManager.createNativeQuery(
                     "SELECT COALESCE(SUM(precio), 0) FROM reservas WHERE fecha = :hoy AND estado_reserva != 'cancelada'")
                     .setParameter("hoy", hoy)
@@ -65,7 +64,6 @@ public class DashboardController {
                     .getSingleResult();
             long reservasHoy = Long.parseLong(resReservasHoy.toString());
 
-            // 5. TICKET PROMEDIO
             Object resTransacciones = entityManager.createNativeQuery(
                     "SELECT COUNT(*) FROM pedidos_delivery WHERE created_at BETWEEN :inicio AND :fin AND estado != 'Cancelado'")
                     .setParameter("inicio", inicioHoy)
@@ -78,7 +76,6 @@ public class DashboardController {
                 ticketPromedio = ingresosTotales.divide(BigDecimal.valueOf(totalTransacciones), 2, RoundingMode.HALF_UP);
             }
 
-            // 6. FLUJO HORARIO
             int[] flujoHorarios = new int[24];
             List<Object[]> resultadosHoras = entityManager.createNativeQuery(
                     "SELECT HOUR(hora) AS hora_bloque, COUNT(*) AS cantidad " +
@@ -94,7 +91,6 @@ public class DashboardController {
                 }
             }
 
-            // 7. CAPACIDAD DEL SALÓN
             Object resMesasOcupadas = entityManager.createNativeQuery(
                     "SELECT COUNT(*) FROM mesas WHERE estado = 'OCUPADA' OR estado = 'Ocupado'")
                     .getSingleResult();

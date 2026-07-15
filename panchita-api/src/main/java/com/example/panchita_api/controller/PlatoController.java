@@ -32,7 +32,6 @@ public class PlatoController {
     public ResponseEntity<Plato> actualizar(@RequestParam Integer id, @RequestBody Plato p) {
         Plato existente = platoRepo.findById(id).orElseThrow(() -> new RuntimeException("Plato no encontrado con id: " + id));
         
-        /* seteo de nuevos valores */
         existente.setName(p.getName());
         existente.setImage(p.getImage());
         existente.setDescription(p.getDescription());

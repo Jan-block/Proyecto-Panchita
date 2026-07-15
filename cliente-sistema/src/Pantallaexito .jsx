@@ -92,7 +92,7 @@ export default function PantallaExito({ datos, onCerrar }) {
               {metodoPagoLabel[datos.metodoPago?.toLowerCase()] || datos.metodoPago}
             </span>
           </div>
-          {/* ✅ NUEVO: Código de estacionamiento */}
+          
 {datos.estacionamiento === 1 && datos.codigoEstacionamiento && (
   <div className="exito-fila">
     <span className="exito-fila__label">🅿️ Código estacionamiento</span>

@@ -42,12 +42,11 @@ public class MapaSalonController {
                 mesa.put("capacidad",      fila[2]);
                 mesa.put("estado",         fila[3]);
                 mesa.put("zona",           fila[4]);
-                mesa.put("fechaOcupacion", fila[5]);   // ISO datetime o null
+                mesa.put("fechaOcupacion", fila[5]);   
                 mesa.put("mozo",           fila[6]);
                 resultado.add(mesa);
             }
 
-            // Enriquecer mesas RESERVADAS con datos del cliente de la reserva
             enrichReservaData(resultado);
 
             return ResponseEntity.ok(resultado);
@@ -94,7 +93,7 @@ public class MapaSalonController {
             LocalDate hace7Dias  = hoy.minusDays(7);
             LocalDate ayer       = hoy.minusDays(1);
 
-            // Ingresos por reservas en los últimos 7 días
+
             Object resReservas = entityManager.createNativeQuery(
                 "SELECT COALESCE(SUM(precio), 0) FROM reservas " +
                 "WHERE fecha BETWEEN :desde AND :hasta AND estado_reserva != 'cancelada'"
@@ -103,7 +102,6 @@ public class MapaSalonController {
             .setParameter("hasta", ayer)
             .getSingleResult();
 
-            // Ingresos por delivery en los últimos 7 días
             Object resDelivery = entityManager.createNativeQuery(
                 "SELECT COALESCE(SUM(total), 0) FROM pedidos_delivery " +
                 "WHERE created_at BETWEEN :inicio AND :fin AND estado != 'Cancelado'"
@@ -155,16 +153,16 @@ public class MapaSalonController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    // ... dentro de MapaSalonController
 
-@GetMapping("/mesas-disponibilidad-dinamica") // Nuevo endpoint sugerido
+
+@GetMapping("/mesas-disponibilidad-dinamica") 
 public ResponseEntity<?> getMesasConDisponibilidadReal(
     @RequestParam LocalDate fecha, 
     @RequestParam LocalTime hora) {
     
     LocalTime fin = hora.plusMinutes(90); // Rango de 90 min
     
-    // Obtener todas las mesas
+   
     List<Object[]> filas = entityManager.createNativeQuery(
         "SELECT m.id, m.numero, m.capacidad FROM mesas m"
     ).getResultList();
@@ -174,8 +172,7 @@ public ResponseEntity<?> getMesasConDisponibilidadReal(
     for (Object[] fila : filas) {
         Long id = ((Number) fila[0]).longValue();
         
-        // AQUÍ ESTÁ LA MAGIA: Consultamos si hay solapamiento en RESERVAS
-        // Nota: Asegúrate de tener acceso a un repositorio o usar un Query aquí
+       
         boolean estaOcupada = (long) entityManager.createNativeQuery(
             "SELECT COUNT(*) FROM reservas r WHERE r.mesa_id = :id AND r.fecha = :fecha " +
             "AND r.hora BETWEEN :inicio AND :fin AND r.estado_reserva != 'cancelada'"
@@ -189,7 +186,7 @@ public ResponseEntity<?> getMesasConDisponibilidadReal(
         Map<String, Object> mesa = new LinkedHashMap<>();
         mesa.put("id", id);
         mesa.put("numero", fila[1]);
-        mesa.put("estado", estaOcupada ? "ocupada" : "disponible"); // <--- Sobrescribimos el estado
+        mesa.put("estado", estaOcupada ? "ocupada" : "disponible"); 
         resultado.add(mesa);
     }
     return ResponseEntity.ok(resultado);

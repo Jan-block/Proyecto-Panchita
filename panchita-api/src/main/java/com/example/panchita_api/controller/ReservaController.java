@@ -32,10 +32,9 @@ public class ReservaController {
     public ResponseEntity<?> guardarReserva(@RequestBody Reserva reserva) {
         try {
 
-            // 1. DEFINIR RANGO: Ejemplo, reserva de 1 hora
+            
         LocalTime horaInicio = reserva.getHora();
-        LocalTime horaFin = horaInicio.plusHours(1); // Ajusta esto según cuánto dura una reserva
-            // 1. VALIDACIÓN DE DISPONIBILIDAD
+        LocalTime horaFin = horaInicio.plusHours(1); // tiempo de duracion
             boolean yaExiste = reservaRepository.existsByMesaIdAndFechaAndHora(
                     reserva.getMesa().getId(), 
                     reserva.getFecha(), 
@@ -46,7 +45,6 @@ public class ReservaController {
                 return ResponseEntity.badRequest().body("Error: La mesa ya se encuentra reservada en este horario.");
             }
 
-            // 2. Normalización
             reserva.setEstadoPago((reserva.getEstadoPago() != null) ? reserva.getEstadoPago() : "pendiente");
             reserva.setEstadoReserva((reserva.getEstadoReserva() != null) ? reserva.getEstadoReserva() : "confirmada");
             
@@ -54,7 +52,6 @@ public class ReservaController {
                 reserva.setCodigoReserva("RES-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
             }
 
-            // 3. Validar Usuario y Mesa
             Usuario usuarioDb = usuarioRepository.findById(reserva.getUsuario().getId())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             Mesa mesaDb = mesaRepository.findById(reserva.getMesa().getId())
@@ -123,22 +120,18 @@ public class ReservaController {
         reservaRepository.deleteById(id);
         return ResponseEntity.ok("Reserva eliminada con éxito");
     }
-        // 🌟 AGREGAR ESTO AL FINAL DE RESERVACONTROLLER.JAVA
-        // 🌟 REEMPLAZA EL MÉTODO AL FINAL DE RESERVACONTROLLER.JAVA CON ESTO:
-        // 🌟 REEMPLAZA EL MÉTODO AL FINAL DE RESERVACONTROLLER.JAVA CON ESTO:
+      
     @Transactional
     @PutMapping("/{id}/finalizar")
     public ResponseEntity<?> finalizarReserva(@PathVariable Integer id) {
         try {
-            // Validamos primero si el registro existe en la BD
+            
             if (!reservaRepository.existsById(id)) {
                 return ResponseEntity.badRequest().body("Error: No existe ninguna reserva con el ID " + id);
             }
             
-            // Ejecutamos la actualización directa sobre la columna evitando problemas de cascada de Hibernate
             reservaRepository.actualizarEstadoReservaDirecto(id, "finalizada");
             
-            // Retornamos un mensaje de éxito limpio
             return ResponseEntity.ok("Reserva finalizada exitosamente.");
         } catch (Exception e) {
             e.printStackTrace();

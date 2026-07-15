@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './AdminDashboard.css';
+import { apiFetch } from './api';
 import GestionMesas from './GestionMesas';
 import GestorReservas from './GestorReservas';
 import MapaSalon from './MapaSalon.jsx';                       // ← NUEVO
@@ -65,9 +66,32 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
 
   // ─── Carga de métricas ────────────────────────────────────────────────────
 
+  // Descarga el reporte Excel enviando el token de autorización
+  // (window.open no permite mandar headers, por eso se pide el archivo con fetch
+  // y se dispara la descarga manualmente).
+  const descargarReporteExcel = async () => {
+    try {
+      const res = await apiFetch('/api/reportes/reservas/excel');
+      if (!res.ok) throw new Error('No se pudo generar el reporte');
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = 'reservas.xlsx';
+      document.body.appendChild(enlace);
+      enlace.click();
+      enlace.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error al descargar el reporte:', err);
+      alert('No se pudo descargar el reporte. Verifica tu sesión.');
+    }
+  };
+
   const cargarDatosDashboard = useCallback(() => {
     // CAMBIA ESTO DE VUELTA A LA RUTA DEL DASHBOARD
-    fetch('http://localhost:8080/api/admin/dashboard-stats')
+    apiFetch('/api/admin/dashboard-stats')
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data) => {
         console.log("Datos recibidos del servidor:", data);
@@ -96,7 +120,7 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
   // ─── Carga de próximas reservas ───────────────────────────────────────────
 
   const cargarProximasReservas = useCallback(() => {
-    fetch('http://localhost:8080/api/reservas')
+    apiFetch('/api/reservas')
       .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data) => setProximasReservas(Array.isArray(data) ? data.slice(0, 5) : []))
       .catch(() => setProximasReservas([]));
@@ -201,7 +225,6 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
           >
             🚗 Estacionamiento
           </button>
-          <button className="menu-item disabled-tab">🚗 Estacionamiento</button>
           <button className={`menu-item ${seccionActiva === 'carta' ? 'active' : ''}`}
             onClick={() => setSeccionActiva('carta')}
           >
@@ -391,7 +414,7 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
                   <h2>📋</h2>
                   <p>Exporta todas las reservas registradas</p>
                   <button
-                    onClick={() => window.open('http://localhost:8080/api/reportes/reservas/excel', '_blank')}
+                    onClick={descargarReporteExcel}
                     style={{
                       marginTop: '12px',
                       background: '#B8860B',

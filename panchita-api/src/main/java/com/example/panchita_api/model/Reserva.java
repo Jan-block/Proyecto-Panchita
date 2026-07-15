@@ -12,17 +12,16 @@ public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // 👈 Cambiado de Long a Integer para acoplarse al INT de MySQL
+    private Integer id; 
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // 👈 AGREGA ESTA LÍNEA
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Usuario usuario;
 
-    // Relación con la tabla Mesas
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mesa_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // 👈 AGREGA ESTA LÍNEA
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
     private Mesa mesa;
 
     @Column(nullable = false)
@@ -55,10 +54,8 @@ public class Reserva {
     @Column(name = "created_at", insertable = false, updatable = false)
     private java.sql.Timestamp createdAt;
 
-    // ... dentro de tu clase Reserva
 private String observaciones;
 
-// Asegúrate de tener los métodos getter y setter
 public String getObservaciones() {
     return observaciones;
 }
@@ -66,13 +63,11 @@ public String getObservaciones() {
 public void setObservaciones(String observaciones) {
     this.observaciones = observaciones;
 }
-
-    // Constructores
     public Reserva() {}
 
     // Getters y Setters Actualizados
-    public Integer getId() { return id; } // 👈 Tipo de retorno modificado
-    public void setId(Integer id) { this.id = id; } // 👈 Parámetro modificado
+    public Integer getId() { return id; } 
+    public void setId(Integer id) { this.id = id; } 
 
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }

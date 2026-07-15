@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './NuestraCarta.css';
+import { apiFetch } from './api';
 
 const FORM_VACIO = { name: '', image: null, imagePreview: null, description: '', price: '', category: '' };
 
@@ -23,7 +24,7 @@ export default function NuestraCarta({ usuarioLogueado }) {
 
   /* CARGAR LISTA DE PLATILLOS */
   useEffect(() => {
-    fetch('http://localhost:8080/api/platos')
+    apiFetch('/api/platos')
       .then(res => {
         if (!res.ok) {
           throw new Error('Error al obtener los platos');
@@ -105,7 +106,7 @@ export default function NuestraCarta({ usuarioLogueado }) {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/platos', {
+      const response = await apiFetch('/api/platos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -140,7 +141,7 @@ export default function NuestraCarta({ usuarioLogueado }) {
     };
 
     try {
-      const response = await fetch(`http://localhost:8080/api/platos?id=${platoEditando.id}`, {
+      const response = await apiFetch(`/api/platos?id=${platoEditando.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -166,7 +167,7 @@ export default function NuestraCarta({ usuarioLogueado }) {
   // ── TOGGLE ESTADO ──
   const toggleEstado = async (plato) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/platos/estado?id=${plato.id}`, {
+      const response = await apiFetch(`/api/platos/estado?id=${plato.id}`, {
         method: 'PATCH',
       });
 

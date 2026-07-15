@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'; 
 import './FormularioReserva.css';
+import { apiFetch } from './api';
 import ModalPago from './ModalPago'; 
 import PantallaExito from './Pantallaexito .jsx';
 
@@ -25,13 +26,13 @@ export default function FormularioReserva({ usuarioLogueado }) {
   });
 
   useEffect(() => {
-    let url = 'http://localhost:8080/api/mesas';
+    let url = '/api/mesas';
     if (datosForm.fecha && datosForm.hora) {
       const horaConSegundos = datosForm.hora.length === 5 ? datosForm.hora + ":00" : datosForm.hora;
-      url = `http://localhost:8080/api/mesas/disponibilidad?fecha=${datosForm.fecha}&hora=${horaConSegundos}`;
+      url = `/api/mesas/disponibilidad?fecha=${datosForm.fecha}&hora=${horaConSegundos}`;
     }
 
-    fetch(url)
+    apiFetch(url)
       .then(res => {
         if (!res.ok) throw new Error('Error al conectar con la API de mesas');
         return res.json();
@@ -100,7 +101,7 @@ export default function FormularioReserva({ usuarioLogueado }) {
   const ejecutarPeticionBackend = (payload) => {
     setEnviando(true);
 
-    fetch('http://localhost:8080/api/reservas', {
+    apiFetch('/api/reservas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

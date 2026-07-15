@@ -6,7 +6,7 @@ import AdminDashboard from './AdminDashboard';
 import './App.css';
 
 function App() {
-  // 1. Evalúa la sesión existente de forma robusta al cargar la página (F5)
+  
   const [vistaActual, setVistaActual] = useState(() => {
     const token = localStorage.getItem('token');
     const rol = localStorage.getItem('rol');
@@ -15,7 +15,7 @@ function App() {
     return rol === 'administrador' ? 'administrador' : 'inicio';
   });
 
-  // Estado dinámico que almacena el objeto de usuario con su ID correspondiente
+  
   const [usuarioLogueado, setUsuarioLogueado] = useState(() => {
     const userJson = localStorage.getItem('usuario');
     return userJson ? JSON.parse(userJson) : null;
@@ -23,7 +23,7 @@ function App() {
 
   const [inicioVisible, setInicioVisible] = useState(false);
 
-  // 🌟 NUEVO: Si el usuario ya estaba en el inicio tras un F5, fuerza su visibilidad instantáneamente
+  
   useEffect(() => {
     if (vistaActual === 'inicio') {
       setInicioVisible(true);
@@ -47,7 +47,7 @@ function App() {
   };
 
   const handleCerrarSesion = () => {
-    localStorage.clear(); // Limpia token, usuario, nombre y rol de golpe
+    localStorage.clear(); 
     setUsuarioLogueado(null);
     setInicioVisible(false);
     setVistaActual('login');
@@ -65,7 +65,7 @@ function App() {
       
       {vistaActual === 'inicio' && (
         <div className={`inicio-animado ${inicioVisible ? 'inicio-visible' : ''}`}>
-          {/* 🌟 ENVIAMOS EL OBJETO COMPLETO: Ahora InicioRestaurante y FormularioReserva tendrán el ID disponible siempre */}
+        
           <InicioRestaurante usuarioLogueado={usuarioLogueado} onLogout={handleCerrarSesion} />
         </div>
       )}

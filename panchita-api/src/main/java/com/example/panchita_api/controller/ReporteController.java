@@ -32,11 +32,8 @@ public class ReporteController {
         try {
             List<Reserva> reservas = reservaRepository.findAll();
 
-            // ✅ APACHE POI: crea el archivo Excel
             XSSFWorkbook workbook = new XSSFWorkbook();
-            XSSFSheet sheet = workbook.createSheet("Reservas Panchita");
-
-            // ── Estilo encabezado (fondo dorado) ──────────────────────
+            XSSFSheet sheet = workbook.createSheet("Reservas Panchita");  
             XSSFCellStyle estiloHeader = workbook.createCellStyle();
             XSSFFont fuenteHeader = workbook.createFont();
             fuenteHeader.setBold(true);
@@ -46,7 +43,6 @@ public class ReporteController {
             estiloHeader.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             estiloHeader.setAlignment(HorizontalAlignment.CENTER);
 
-            // ── Título principal ───────────────────────────────────────
             Row titulo = sheet.createRow(0);
             Cell celdaTitulo = titulo.createCell(0);
             celdaTitulo.setCellValue("REPORTE DE RESERVAS - RESTAURANTE PANCHITA");
@@ -58,12 +54,10 @@ public class ReporteController {
             celdaTitulo.setCellStyle(estiloTitulo);
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 6));
 
-            // ── Fecha de generación ────────────────────────────────────
             Row fechaRow = sheet.createRow(1);
             fechaRow.createCell(0).setCellValue("Generado: " + LocalDate.now().toString());
             sheet.addMergedRegion(new CellRangeAddress(1, 1, 0, 6));
 
-            // ── Encabezados de columnas ────────────────────────────────
             Row header = sheet.createRow(3);
             String[] columnas = {"ID", "Cliente", "Fecha", "Hora", "Personas", "Estado", "Precio (S/)"};
             for (int i = 0; i < columnas.length; i++) {
@@ -72,7 +66,6 @@ public class ReporteController {
                 celda.setCellStyle(estiloHeader);
             }
 
-            // ── Datos ──────────────────────────────────────────────────
             int fila = 4;
             for (Reserva r : reservas) {
                 Row row = sheet.createRow(fila++);
@@ -85,10 +78,8 @@ public class ReporteController {
                 row.createCell(6).setCellValue(r.getPrecio()        != null ? r.getPrecio().doubleValue() : 0);
             }
 
-            // ── Autoajuste de columnas ─────────────────────────────────
             for (int i = 0; i <= 6; i++) sheet.autoSizeColumn(i);
 
-            // ── Convierte a bytes y envía ──────────────────────────────
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             workbook.close();

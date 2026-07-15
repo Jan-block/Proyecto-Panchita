@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './MapaSalon.css';
+import { apiFetch } from './api';
 
 const ESTADOS = {
   disponible: { label: 'Disponible', clase: 'mesa-libre',     icono: '○' },
@@ -42,7 +43,7 @@ export default function MapaSalon({ onAlerta }) {
 
   const cargarMesas = useCallback(() => {
     setCargando(true);
-    fetch(`http://localhost:8080/api/mesas/disponibilidad?fecha=${fecha}&hora=${hora}`)
+    apiFetch(`/api/mesas/disponibilidad?fecha=${fecha}&hora=${hora}`)
       .then(r => {
         if (!r.ok) throw new Error('Error de conexión');
         return r.json();
@@ -108,7 +109,7 @@ export default function MapaSalon({ onAlerta }) {
 
   // ── Marcar "Asistió" desde Reservas → Pone mesa en OCUPADA ───────────────
   const marcarMesaOcupada = (mesaId) => {
-    fetch(`http://localhost:8080/api/mesas/${mesaId}/estado`, {
+    apiFetch(`/api/mesas/${mesaId}/estado`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado: 'ocupada' }),
@@ -121,7 +122,7 @@ export default function MapaSalon({ onAlerta }) {
       alert("No se encontró ningún ID de reserva asociado a esta mesa.");
       return;
     }
-    fetch(`http://localhost:8080/api/reservas/${reservaId}/finalizar`, {
+    apiFetch(`/api/reservas/${reservaId}/finalizar`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' }
     })
@@ -318,7 +319,7 @@ function ModalMesa({ mesa, onCerrar, onActualizar, onMarcarOcupada }) {
   }
 
   const cambiarEstado = (nuevoEstado) => {
-    fetch(`http://localhost:8080/api/mesas/${mesa.id}/estado`, {
+    apiFetch(`/api/mesas/${mesa.id}/estado`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: nuevoEstado }),
@@ -339,7 +340,7 @@ function ModalMesa({ mesa, onCerrar, onActualizar, onMarcarOcupada }) {
     onMarcarOcupada(mesa.id);
     // También actualizar la reserva asociada si existe
     if (mesa.reservaId) {
-      fetch(`http://localhost:8080/api/reservas/${mesa.reservaId}/estado`, {
+      apiFetch(`/api/reservas/${mesa.reservaId}/estado`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: 'asistió' }),
@@ -433,7 +434,7 @@ function ModalMesa({ mesa, onCerrar, onActualizar, onMarcarOcupada }) {
                     // 🌟 INTERCEPTAMOS SI EL BOTÓN PRESIONADO ES "DISPONIBLE" Y HAY RESERVA ACTIVA
                     if (key === 'disponible' && mesa.reservaId) {
                       
-                      fetch(`http://localhost:8080/api/reservas/${mesa.reservaId}/finalizar`, {
+                      apiFetch(`/api/reservas/${mesa.reservaId}/finalizar`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' }
                       })

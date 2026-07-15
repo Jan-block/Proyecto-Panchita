@@ -21,13 +21,12 @@ public class Pedido_delivery { // Nota: El nombre mapeará a la tabla pedidos_de
     @Column(nullable = false)
     private String estado;
 
-    // Bloque para asignar la fecha y hora actual automáticamente al guardar
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Constructores
+
     public Pedido_delivery() {}
 
     public Pedido_delivery(BigDecimal total, String estado) {
@@ -35,7 +34,6 @@ public class Pedido_delivery { // Nota: El nombre mapeará a la tabla pedidos_de
         this.estado = estado;
     }
 
-    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public LocalDateTime getCreatedAt() { return createdAt; }

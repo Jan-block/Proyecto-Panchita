@@ -10,13 +10,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/salas")
-@CrossOrigin(origins = "http://localhost:5173") // 👈 Permisos CORS listos para React
+@CrossOrigin(origins = "http://localhost:5173") 
 public class SalaController {
 
     @Autowired
     private SalaRepository salaRepository;
 
-    // 🚀 GET: Para que el formulario de mesas cargue las salas reales de la BD
+    // get
     @GetMapping
     public ResponseEntity<List<Sala>> obtenerSalas() {
         try {
@@ -26,7 +26,7 @@ public class SalaController {
         }
     }
 
-    // 🛠️ POST: Para crear un área nueva desde la interfaz web del administrador
+    // post
     @PostMapping
     public ResponseEntity<?> crearSala(@RequestBody Sala sala) {
         try {

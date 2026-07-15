@@ -3,10 +3,10 @@ import './InicioRestaurante.css';
 import logoPanchita from './assets/panchita.png'; 
 import HeroParallax from './HeroParallax';
 import imgTradicion from './assets/tradicion.jpg';
-import FormularioReserva from './FormularioReserva'; 
-import NuestraCarta from './NuestraCarta';
+import FormularioReserva from './FormularioReserva'; ;
+import NuestraCarta from './NuestraCarta.jsx';
 
-// 🌟 CORRECCIÓN DE PARÁMETROS: Recibimos exactamente 'usuarioLogueado' como viene de App.jsx
+
 export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
   
   const [seccionActiva, setSeccionActiva] = useState('portada');
@@ -85,7 +85,7 @@ export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
         
         <div className="nav-user-dropdown-modern">
           <div className="avatar-trigger-modern">
-            {/* 🌟 DINÁMICO: Evaluamos si existe el objeto usuarioLogueado y su nombre */}
+            
             <span className="avatar-inicial-modern">
               {usuarioLogueado && usuarioLogueado.nombre 
                 ? usuarioLogueado.nombre.charAt(0).toUpperCase() 
@@ -96,7 +96,7 @@ export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
           <div className="dropdown-panel-modern">
             <div className="panel-user-header">
               <p className="panel-greet">Bienvenido de vuelta,</p>
-              {/* 🌟 DINÁMICO: Mostramos el nombre completo real guardado en sesión */}
+             
               <h4 className="panel-name">
                 {usuarioLogueado && usuarioLogueado.nombre 
                   ? usuarioLogueado.nombre 
@@ -115,7 +115,7 @@ export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
         </div>
       </nav>
 
-      {/* ── 5. RENDERIZADO CONDICIONAL DE LAS VISTAS ── */}
+     
       {seccionActiva === 'portada' ? (
         <>
           <div className="hero-main-wrapper-scroll">
@@ -187,7 +187,6 @@ export default function InicioRestaurante({ usuarioLogueado, onLogout }) {
       ) : (
         /* ── VISTA DEDICADA DE RESERVAS ── */
         <div className="seccion-reserva-vistas-pagina" style={{ paddingTop: '140px', paddingBottom: '60px' }}>
-          {/* 🌟 PASO DE ORO: Enviamos la propiedad mapeada correctamente al formulario */}
           <FormularioReserva 
             usuarioLogueado={usuarioLogueado} 
             alEnviarReserva={(datosForm) => {

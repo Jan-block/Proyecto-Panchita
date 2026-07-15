@@ -9,19 +9,18 @@ public class Mesa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // 👈 Cambiado de Long a Integer para tu INT de MySQL
+    private Integer id; 
 
     @Column(name = "sala_id", nullable = false)
-    private Integer salaId; // 👈 Cambiado de Long a Integer
+    private Integer salaId; 
 
-    // --- AGREGA ESTO AQUÍ ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sala_id", insertable = false, updatable = false)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Sala sala;
 
     @ManyToOne
-@JoinColumn(name = "reserva_id") // Asegúrate que la mesa tenga esta columna
+@JoinColumn(name = "reserva_id") 
 private Reserva reserva;
 
     @Column(nullable = false, length = 10)
@@ -36,14 +35,12 @@ private Reserva reserva;
     @Column(length = 50)
     private String ubicacion;
 
-    // Constructor vacío exigido por JPA
     public Mesa() {}
 
     public Sala getSala() {
         return sala;
     }
 
-    // Getters y Setters Actualizados
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
 
@@ -59,6 +56,6 @@ private Reserva reserva;
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
 
-    public String getUbicacion() { return ubicacion; } // 👈 Corregido el nombre del método (getUlocation -> getUbicacion)
+    public String getUbicacion() { return ubicacion; } 
     public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
 }

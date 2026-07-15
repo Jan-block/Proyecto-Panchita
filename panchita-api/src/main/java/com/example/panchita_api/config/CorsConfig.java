@@ -16,19 +16,14 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        // Permitir credenciales como cookies o headers de autenticación
         config.setAllowCredentials(true);
         
-        // El origen exacto de tu frontend en React
         config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
         
-        // Todos los encabezados permitidos
         config.setAllowedHeaders(Arrays.asList("*"));
         
-        // Métodos HTTP necesarios para tu API rest
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         
-        // Registrar la configuración para todas las rutas del backend
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

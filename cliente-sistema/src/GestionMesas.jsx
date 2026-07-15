@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './GestionMesas.css';
+import { apiFetch } from './api';
 import { MesaPlano } from './MesaPlano';
 import './MesaPlano.css';
 
@@ -20,7 +21,7 @@ export default function GestionMesas() {
   const [mesaAEliminar, setMesaAEliminar] = useState(null); // { id, numero }
 
   const cargarInfraestructura = () => {
-    fetch('http://localhost:8080/api/salas')
+    apiFetch('/api/salas')
       .then(res => {
         if (!res.ok) throw new Error('Ruta no encontrada o error en servidor');
         return res.json();
@@ -38,7 +39,7 @@ export default function GestionMesas() {
       });
 
     setCargandoMesas(true);
-    fetch('http://localhost:8080/api/mesas')
+    apiFetch('/api/mesas')
       .then(res => res.json())
       .then(data => {
         setMesasAdmin(data);
@@ -84,7 +85,7 @@ export default function GestionMesas() {
       setMensajeSala({ texto: 'El nombre de la sala es obligatorio.', tipo: 'error' });
       return;
     }
-    fetch('http://localhost:8080/api/salas', {
+    apiFetch('/api/salas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -116,7 +117,7 @@ export default function GestionMesas() {
     setGuardandoMesa(true);
     setMensajeMesa({ texto: '', tipo: '' });
 
-    fetch('http://localhost:8080/api/mesas', {
+    apiFetch('/api/mesas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -149,7 +150,7 @@ export default function GestionMesas() {
     if (estadoActual === 'disponible') siguienteEstado = 'ocupada';
     else if (estadoActual === 'ocupada') siguienteEstado = 'reservada';
 
-    fetch(`http://localhost:8080/api/mesas/${mesaId}/estado`, {
+    apiFetch(`/api/mesas/${mesaId}/estado`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado: siguienteEstado })
@@ -166,7 +167,7 @@ export default function GestionMesas() {
 
   const ejecutarEliminacion = () => {
     if (!mesaAEliminar) return;
-    fetch(`http://localhost:8080/api/mesas/${mesaAEliminar.id}`, { method: 'DELETE' })
+    apiFetch(`/api/mesas/${mesaAEliminar.id}`, { method: 'DELETE' })
       .then(res => {
         if (!res.ok) throw new Error('Error al eliminar');
         cargarInfraestructura();

@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 
 const NARANJA   = [188, 90, 26];
-const NARANJA_L = [253, 245, 238];   // Fondo suave naranja
+const NARANJA_L = [253, 245, 238];   
 const DARK      = [38, 25, 21];
 const MUTED     = [110, 94, 88];
 const BLANCO    = [255, 255, 255];

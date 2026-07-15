@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import './GestorReservas.css';
+import { apiFetch } from './api';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
@@ -44,7 +45,7 @@ const GestorReservas = () => {
 
     // ── Carga ────────────────────────────────────────────────────────────────
     const cargarReservas = () => {
-        fetch('http://localhost:8080/api/reservas')
+        apiFetch('/api/reservas')
             .then(res => res.json())
             .then(data => setReservas(data))
             .catch(err => console.error('Error al cargar:', err));
@@ -121,7 +122,7 @@ const GestorReservas = () => {
             observaciones: reservaEditando.observaciones,
             mesa: { id: parseInt(reservaEditando.mesaId) }
         };
-        fetch(`http://localhost:8080/api/reservas/${reservaEditando.id}`, {
+        apiFetch(`/api/reservas/${reservaEditando.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(datosActualizados)
@@ -133,7 +134,7 @@ const GestorReservas = () => {
 
     // ── Estado de pago ───────────────────────────────────────────────────────
     const cambiarEstado = (id, nuevoEstado) => {
-        fetch(`http://localhost:8080/api/reservas/${id}/estado`, {
+        apiFetch(`/api/reservas/${id}/estado`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ estado: nuevoEstado })
@@ -143,7 +144,7 @@ const GestorReservas = () => {
     // ── Eliminar ─────────────────────────────────────────────────────────────
     const eliminarReserva = (id) => {
         if (!window.confirm('¿Estás seguro de que deseas eliminar esta reserva?')) return;
-        fetch(`http://localhost:8080/api/reservas/${id}`, { method: 'DELETE' })
+        apiFetch(`/api/reservas/${id}`, { method: 'DELETE' })
             .then(r => { if (r.ok) cargarReservas(); else alert('Error al eliminar la reserva'); })
             .catch(err => console.error('Error:', err));
     };
@@ -152,7 +153,7 @@ const GestorReservas = () => {
     const verHistorial = (reserva) => {
         const usuarioId = reserva.usuario?.id;
         if (!usuarioId) return;
-        fetch(`http://localhost:8080/api/reservas?usuarioId=${usuarioId}`)
+        apiFetch(`/api/reservas?usuarioId=${usuarioId}`)
             .then(res => res.json())
             .then(data => {
                 setHistorialCliente(data);

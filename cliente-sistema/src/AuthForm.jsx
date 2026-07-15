@@ -75,11 +75,10 @@ export default function AuthForm({ onLoginSuccess }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Evita que la página se recargue por completo
+    e.preventDefault(); 
     setError('');
     setIsSuccess(false);
 
-    // ── CORRECCIÓN AQUÍ: FLUJO ESTRUCTURADO SIN INTERRUPCIONES BRUSCAS ──
     if (!isLogin) {
       const regexTelefono = /^[0-9]{7,9}$/;
       if (!regexTelefono.test(registerData.telefono)) {
@@ -97,7 +96,6 @@ export default function AuthForm({ onLoginSuccess }) {
       }
     }
 
-    // Si pasa todas las validaciones anteriores con éxito, recién activa el cargando
     setIsLoading(true);
 
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
@@ -122,10 +120,8 @@ export default function AuthForm({ onLoginSuccess }) {
 }
         const tokenSesion = data.token || 'sesion_activa_panchita';
 
-        // Creamos un objeto limpio de usuario para la sesión
         const infoUsuario = { id: idUsuario, nombre: nombre, rol: rol };
 
-        // Guardamos todo en el localStorage de forma segura como texto JSON
         localStorage.setItem('usuario', JSON.stringify(infoUsuario));
         localStorage.setItem('token', tokenSesion);
         localStorage.setItem('rol', rol);
@@ -134,7 +130,6 @@ export default function AuthForm({ onLoginSuccess }) {
         setIsSuccess(true);
         
         setTimeout(() => {
-          // Le pasamos el objeto completo a App.jsx
           onLoginSuccess(infoUsuario, tokenSesion);
         }, 1500);
       } else {
@@ -249,7 +244,7 @@ export default function AuthForm({ onLoginSuccess }) {
                 />
               </div>
             </div>
-            {/* ── ⬆️ FIN DE LA NUEVA PARTE ── */}
+           
 
 
             {/* Email */}
