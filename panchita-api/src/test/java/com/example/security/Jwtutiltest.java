@@ -1,4 +1,4 @@
-package com.example.panchita_api;
+package com.example.security;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

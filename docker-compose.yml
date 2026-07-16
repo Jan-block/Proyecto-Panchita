@@ -1,0 +1,55 @@
+# =============================================================
+# docker-compose.yml - Proyecto Panchita
+# Levanta el backend (Spring Boot) y su base de datos (MySQL)
+# juntos, con la configuración de red y variables de entorno
+# ya conectadas entre sí.
+#
+# Uso:
+#   docker compose up --build      (primera vez o tras cambios)
+#   docker compose up -d           (en segundo plano)
+#   docker compose down            (apagar todo)
+# =============================================================
+
+version: "3.9"
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: panchita-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-admin}
+      MYSQL_DATABASE: ${DB_NAME:-restaurante}
+    ports:
+      - "3306:3306"
+    volumes:
+      - panchita_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-admin}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./panchita-api
+      dockerfile: Dockerfile
+    container_name: panchita-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-restaurante}
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:-admin}
+      JWT_SECRET: ${JWT_SECRET:-EsteEsUnSecretoSuperLargoYSeguroParaPanchita2026QueCumpleConLosBitsRequeridos12345}
+      ADMIN_SECRET_CODE: ${ADMIN_SECRET_CODE:-PANCHITA2026}
+    ports:
+      - "8080:8080"
+
+volumes:
+  panchita_mysql_data:
