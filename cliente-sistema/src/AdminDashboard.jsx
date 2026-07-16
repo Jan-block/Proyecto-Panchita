@@ -9,6 +9,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import GestionDelivery from './Gestiondelibery';
 import NuestraCarta from './NuestraCarta.jsx';
 import GestionEstacionamiento from './GestionEstacionamiento';
+import GestionMenu from './GestionMenu.jsx';
+import GestionInventario from './GestionInventario.jsx';
 
 export default function AdminDashboard({ usuarioLogueado, onLogout }) {
   const [seccionActiva, setSeccionActiva] = useState('panel');
@@ -230,6 +232,16 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
           >
             🍳 Platos / Carta
           </button>
+          <button className={`menu-item ${seccionActiva === 'menu' ? 'active' : ''}`}
+            onClick={() => setSeccionActiva('menu')}
+          >
+            🍽️ Menú
+          </button>
+          <button className={`menu-item ${seccionActiva === 'inventario' ? 'active' : ''}`}
+            onClick={() => setSeccionActiva('inventario')}
+          >
+            📦 Inventario
+          </button>
           {/* ── REPORTES: activado ── */}
           <button
             className={`menu-item ${seccionActiva === 'reportes' ? 'active' : ''}`}
@@ -394,6 +406,8 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
           {seccionActiva === 'delivery' && <GestionDelivery />}
           {seccionActiva === 'carta' && <NuestraCarta usuarioLogueado={usuarioLogueado}/>}
           {seccionActiva === 'estacionamiento' && <GestionEstacionamiento />}
+          {seccionActiva === 'menu' && <GestionMenu usuarioLogueado={usuarioLogueado}/>}
+          {seccionActiva === 'inventario' && <GestionInventario usuarioLogueado={usuarioLogueado}/>}
 
           {/* ══ REPORTES ══ */}
           {seccionActiva === 'reportes' && (

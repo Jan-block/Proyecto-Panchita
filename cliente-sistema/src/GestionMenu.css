@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+.menu-wrapper {
+  font-family: 'Inter', sans-serif;
+  color: #2C1A0E;
+  padding: 8px 4px 32px;
+}
+
+/* ── HEADER ── */
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.menu-header__centro {
+  text-align: left;
+}
+
+.menu-eyebrow {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: #D4A84B;
+  font-size: .95rem;
+  letter-spacing: .06em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.menu-titulo {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #2C1A0E;
+}
+
+.menu-separador {
+  width: 48px;
+  height: 3px;
+  background: #C0392B;
+  border-radius: 2px;
+  margin: 10px 0;
+}
+
+.menu-subtitulo {
+  color: #7A6055;
+  font-size: .95rem;
+}
+
+.btn-agregar-menu {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: #C0392B;
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(192,57,43,.35);
+  transition: transform .15s ease, background .15s ease;
+  flex-shrink: 0;
+}
+.btn-agregar-menu:hover { background: #962d22; transform: translateY(-2px); }
+
+.menu-vacio {
+  color: #7A6055;
+  font-style: italic;
+  padding: 24px 0;
+}
+
+/* ── GRID DE MENÚS ── */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.menu-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(44,26,14,.10);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid rgba(212,168,75,.25);
+  transition: opacity .15s ease;
+}
+
+.menu-card--inactivo {
+  opacity: .55;
+}
+
+.menu-card__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.menu-card__nombre {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  color: #2C1A0E;
+}
+
+.menu-card__precio {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #C0392B;
+  white-space: nowrap;
+}
+
+.menu-card__descripcion {
+  font-size: .85rem;
+  color: #7A6055;
+}
+
+.menu-card__items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #FAF6F0;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.menu-card__item {
+  display: flex;
+  justify-content: space-between;
+  font-size: .88rem;
+}
+
+.menu-card__etiqueta {
+  color: #7A6055;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: .72rem;
+  letter-spacing: .04em;
+  align-self: center;
+}
+
+.menu-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.menu-card__toggle {
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.menu-card__toggle.activo { background: #D1FAE5; color: #065F46; }
+.menu-card__toggle.inactivo { background: #F3F4F6; color: #374151; }
+
+.menu-card__btn {
+  border: 1px solid #C0392B;
+  background: transparent;
+  color: #C0392B;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.menu-card__btn:hover { background: #C0392B; color: #fff; }
+
+/* ── REFERENCIA DE PRECIO EN EL MODAL ── */
+.menu-referencia {
+  font-size: .82rem;
+  color: #7A6055;
+  background: #FAF6F0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: -4px 0 4px;
+}
+
+/* ── TOAST ── */
+.menu-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: .9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  color: #fff;
+}
+.menu-toast--ok  { background: #2f9e63; }
+.menu-toast--warn{ background: #b8862b; }
+.menu-toast--err { background: #C0392B; }
