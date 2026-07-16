@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './GestionDelivery.css';
+import { apiFetch } from './api';
 
 // ── DATOS MOCK ──────────────────────────────────────────────────────────────
 const REPARTIDORES_MOCK = [
@@ -86,10 +87,46 @@ function useNow(interval = 30000) {
   return now;
 }
 
+const adaptarPedidoDesdeApi = (pedido) => ({
+  id: pedido.id,
+
+  cliente: pedido.nombreCliente || '',
+  telefono: pedido.telefonoContacto || '',
+  sinCuenta: pedido.usuarioId == null,
+
+  direccion: pedido.direccionEntrega || '',
+  distrito: pedido.distrito || '',
+  notas: pedido.referencia || '',
+
+  subtotal: Number(pedido.subtotal || 0),
+  costoEnvio: Number(pedido.costoEnvio || 0),
+  descuento: Number(pedido.descuento || 0),
+  total: Number(pedido.total || 0),
+
+  estado: pedido.estado || 'Pendiente',
+  metodoPago: pedido.metodoPago || 'Efectivo',
+
+  items: [],
+  repartidorId: null,
+  motivoCancelacion: null,
+
+  tsCreado: pedido.createdAt,
+  tsPrepando: null,
+  tsEnCamino: null,
+  tsEntregado: null,
+
+  hora: pedido.createdAt
+    ? new Date(pedido.createdAt).toLocaleTimeString('es-PE', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : '--:--',
+});
+
 // ════════════════════════════════════════════════════════════════════════════
 export default function GestionDelivery() {
   const now = useNow();
-  const [pedidos, setPedidos]               = useState(PEDIDOS_MOCK);
+  const [pedidos, setPedidos] = useState([]);
   const [repartidores]                      = useState(REPARTIDORES_MOCK);
   const [zonas]                             = useState(ZONAS_MOCK);
   const [filtroEstado, setFiltroEstado]     = useState('Todos');
@@ -111,6 +148,34 @@ export default function GestionDelivery() {
     metodoPago: 'Efectivo', items: [],
     descuento: 0,
   });
+  useEffect(() => {
+  const cargarPedidosDesdeBD = async () => {
+    try {
+      const respuesta = await apiFetch('/api/delivery');
+
+      if (!respuesta.ok) {
+        const mensaje = await respuesta.text();
+
+        throw new Error(
+          `Error ${respuesta.status} al cargar delivery: ${mensaje}`
+        );
+      }
+
+      const datos = await respuesta.json();
+
+      const pedidosConvertidos = datos.map(
+        adaptarPedidoDesdeApi
+      );
+
+      setPedidos(pedidosConvertidos);
+    } catch (error) {
+      console.error('Error cargando pedidos:', error);
+      alert(error.message);
+    }
+  };
+
+  cargarPedidosDesdeBD();
+}, []);
 
   // ── Métricas ──────────────────────────────────────────────────────────────
   const metricas = {
@@ -194,28 +259,111 @@ export default function GestionDelivery() {
     setNuevoItem({ nombre: '', qty: 1, precio: '' });
   };
 
-  const confirmarNuevoPedido = () => {
-    if (!nuevoPedido.cliente || !nuevoPedido.direccion || nuevoPedido.items.length === 0) return;
-    const subtotal  = nuevoPedido.items.reduce((s, i) => s + i.precio * i.qty, 0);
-    const zona      = zonas.find(z => z.nombre === nuevoPedido.distrito);
-    const costoEnvio = zona ? zona.costo : 0;
-    const total     = subtotal + costoEnvio - Number(nuevoPedido.descuento || 0);
-    const d         = new Date();
-    const hora      = `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
-    setPedidos(prev => [{
-      ...nuevoPedido,
-      id: Math.max(...prev.map(x => x.id)) + 1,
-      subtotal, costoEnvio, total,
-      estado: 'Pendiente',
-      hora,
-      tsCreado:    d.toISOString(),
-      tsPrepando:  null, tsEnCamino: null, tsEntregado: null,
-      repartidorId: null,
-      motivoCancelacion: null,
-    }, ...prev]);
-    setNuevoPedido({ cliente: '', telefono: '', sinCuenta: false, direccion: '', distrito: '', notas: '', metodoPago: 'Efectivo', items: [], descuento: 0 });
-    setMostrarFormNuevo(false);
+ const confirmarNuevoPedido = async () => {
+  if (
+    !nuevoPedido.cliente ||
+    !nuevoPedido.telefono ||
+    !nuevoPedido.direccion ||
+    !nuevoPedido.distrito ||
+    nuevoPedido.items.length === 0
+  ) {
+    alert('Completa todos los datos obligatorios.');
+    return;
+  }
+
+  const subtotal = nuevoPedido.items.reduce(
+    (acumulado, item) =>
+      acumulado +
+      Number(item.precio) * Number(item.qty),
+    0
+  );
+
+  const zonaSeleccionada = zonas.find(
+    (zona) => zona.nombre === nuevoPedido.distrito
+  );
+
+  const costoEnvio = zonaSeleccionada
+    ? Number(zonaSeleccionada.costo)
+    : 0;
+
+  const descuento = Number(
+    nuevoPedido.descuento || 0
+  );
+
+  const total =
+    subtotal + costoEnvio - descuento;
+
+  const pedidoParaGuardar = {
+    usuarioId: null,
+    nombreCliente: nuevoPedido.cliente,
+    telefonoContacto: nuevoPedido.telefono,
+    direccionEntrega: nuevoPedido.direccion,
+    referencia: nuevoPedido.notas || '',
+    distrito: nuevoPedido.distrito,
+    subtotal,
+    costoEnvio,
+    descuento,
+    total,
+    metodoPago: nuevoPedido.metodoPago,
+    estado: 'Pendiente',
   };
+
+  try {
+    const respuesta = await apiFetch('/api/delivery', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(pedidoParaGuardar),
+    });
+
+    if (!respuesta.ok) {
+      const mensaje = await respuesta.text();
+
+      throw new Error(
+        `No se pudo guardar. Error ${respuesta.status}: ${mensaje}`
+      );
+    }
+
+    const pedidoGuardado = await respuesta.json();
+
+    const pedidoParaPantalla = {
+      ...adaptarPedidoDesdeApi(pedidoGuardado),
+
+      // Los platos todavía se mantienen en React.
+      // Después conectaremos detalle_pedido.
+      items: nuevoPedido.items,
+    };
+
+    setPedidos((pedidosAnteriores) => [
+      pedidoParaPantalla,
+      ...pedidosAnteriores,
+    ]);
+
+    setNuevoPedido({
+      cliente: '',
+      telefono: '',
+      sinCuenta: false,
+      direccion: '',
+      distrito: '',
+      notas: '',
+      metodoPago: 'Efectivo',
+      items: [],
+      descuento: 0,
+    });
+
+    setMostrarFormNuevo(false);
+
+    alert('Pedido guardado correctamente en MySQL.');
+  } catch (error) {
+    console.error(
+      'Error registrando pedido delivery:',
+      error
+    );
+
+    alert(error.message);
+  }
+};
 
   // ── Reporte del día ───────────────────────────────────────────────────────
   const reporte = {

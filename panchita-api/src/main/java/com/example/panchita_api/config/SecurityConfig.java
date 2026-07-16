@@ -29,24 +29,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .authorizeRequests(auth -> auth
-                // Preflight de CORS: el navegador manda OPTIONS antes de cada request real
-                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Rutas publicas: login y registro
-                .antMatchers("/api/auth/**").permitAll()
-                // Health check publico para que el monitoreo externo pueda consultarlo sin token
-                .antMatchers("/actuator/health", "/actuator/info").permitAll()
-                // El resto de Actuator (metrics) solo para administradores
-                .antMatchers("/actuator/**").hasRole("ADMINISTRADOR")
-                // Rutas administrativas: dashboard y reportes
-                .antMatchers("/api/admin/**", "/api/reportes/**").hasRole("ADMINISTRADOR")
-                // Todo lo demas requiere estar logueado (con cualquier rol)
-                .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests(auth -> auth
+                        // Preflight de CORS: el navegador manda OPTIONS antes de cada request real
+                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Rutas publicas: login y registro
+                        .antMatchers("/api/auth/**").permitAll()
+                        // Health check publico para que el monitoreo externo pueda consultarlo sin
+                        // token
+                        .antMatchers("/actuator/health", "/actuator/info").permitAll()
+                        // El resto de Actuator (metrics) solo para administradores
+                        .antMatchers(
+                                "/api/admin/**",
+                                "/api/reportes/**",
+                                "/api/delivery/**")
+                        .hasRole("ADMINISTRADOR") // Rutas administrativas: dashboard y reportes
+                        .antMatchers("/api/admin/**", "/api/reportes/**").hasRole("ADMINISTRADOR")
+                        // Todo lo demas requiere estar logueado (con cualquier rol)
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
