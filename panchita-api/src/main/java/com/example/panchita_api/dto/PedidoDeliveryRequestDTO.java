@@ -1,102 +1,25 @@
-package com.example.panchita_api.model;
+package com.example.panchita_api.dto;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "pedidos_delivery")
-public class Pedido_delivery {
+// Igual que Pedido_delivery, pero incluye la lista de platos vendidos
+// (para poder calcular después los platos más vendidos).
+public class PedidoDeliveryRequestDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DetallePedidoDelivery> detalles = new ArrayList<>();
-
-    public List<DetallePedidoDelivery> getDetalles() {
-        return detalles;
-    }
-
-    public void setDetalles(List<DetallePedidoDelivery> detalles) {
-        this.detalles = detalles;
-    }
-
-    @Column(name = "usuario_id")
     private Long usuarioId;
-
-    @Column(name = "direccion_entrega", nullable = false)
     private String direccionEntrega;
-
-    @Column(name = "referencia")
     private String referencia;
-
-    @Column(name = "distrito", nullable = false)
     private String distrito;
-
-    @Column(name = "telefono_contacto", nullable = false)
     private String telefonoContacto;
-
-    @Column(name = "nombre_cliente", nullable = false)
     private String nombreCliente;
-
-    @Column(name = "subtotal", precision = 10, scale = 2)
     private BigDecimal subtotal;
-
-    @Column(name = "costo_envio", precision = 10, scale = 2)
     private BigDecimal costoEnvio;
-
-    @Column(name = "descuento", precision = 10, scale = 2)
     private BigDecimal descuento;
-
-    @Column(name = "total", nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
-
-    @Column(name = "metodo_pago", nullable = false)
     private String metodoPago;
-
-    @Column(name = "estado", nullable = false)
     private String estado;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-
-        if (estado == null || estado.trim().isEmpty()) {
-            estado = "Pendiente";
-        }
-
-        if (subtotal == null) {
-            subtotal = BigDecimal.ZERO;
-        }
-
-        if (costoEnvio == null) {
-            costoEnvio = BigDecimal.ZERO;
-        }
-
-        if (descuento == null) {
-            descuento = BigDecimal.ZERO;
-        }
-    }
-
-    public Pedido_delivery() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private List<ItemPedidoDTO> items;
 
     public Long getUsuarioId() {
         return usuarioId;
@@ -194,11 +117,11 @@ public class Pedido_delivery {
         this.estado = estado;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public List<ItemPedidoDTO> getItems() {
+        return items;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setItems(List<ItemPedidoDTO> items) {
+        this.items = items;
     }
 }

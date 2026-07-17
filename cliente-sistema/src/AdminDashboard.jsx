@@ -11,6 +11,7 @@ import NuestraCarta from './NuestraCarta.jsx';
 import GestionEstacionamiento from './GestionEstacionamiento';
 import GestionMenu from './GestionMenu.jsx';
 import GestionInventario from './GestionInventario.jsx';
+import ReportesVentas from './ReportesVentas.jsx';
 
 export default function AdminDashboard({ usuarioLogueado, onLogout }) {
   const [seccionActiva, setSeccionActiva] = useState('panel');
@@ -412,9 +413,11 @@ export default function AdminDashboard({ usuarioLogueado, onLogout }) {
           {/* ══ REPORTES ══ */}
           {seccionActiva === 'reportes' && (
             <div className="view-header">
-              <div className="view-header-top">
+              <ReportesVentas />
+
+              <div className="view-header-top" style={{ marginTop: '32px' }}>
                 <div>
-                  <h1>📊 Reportes</h1>
+                  <h1>📥 Exportar</h1>
                   <p>Exporta la información del restaurante en formato Excel</p>
                 </div>
               </div>

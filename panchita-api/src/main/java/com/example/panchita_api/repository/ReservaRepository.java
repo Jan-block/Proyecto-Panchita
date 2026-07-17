@@ -12,6 +12,7 @@ import java.util.List;
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     
     List<Reserva> findByFecha(LocalDate fecha);
+    List<Reserva> findByFechaBetween(LocalDate desde, LocalDate hasta);
     boolean existsByMesaIdAndFechaAndHora(Integer mesaId, LocalDate fecha, LocalTime hora);
     
     // 🌟 NUEVO MÉTODO: Actualiza únicamente la columna del estado sin tocar las relaciones de la mesa ni el usuario

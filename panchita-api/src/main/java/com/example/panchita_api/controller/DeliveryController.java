@@ -1,11 +1,17 @@
 package com.example.panchita_api.controller;
 
+import com.example.panchita_api.dto.ItemPedidoDTO;
+import com.example.panchita_api.dto.PedidoDeliveryRequestDTO;
+import com.example.panchita_api.model.DetallePedidoDelivery;
 import com.example.panchita_api.model.Pedido_delivery;
+import com.example.panchita_api.model.Plato;
 import com.example.panchita_api.repository.PedidoDeliveryRepository;
+import com.example.panchita_api.repository.PlatoRepository;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +22,7 @@ import java.util.Set;
 public class DeliveryController {
 
     private final PedidoDeliveryRepository pedidoRepository;
+    private final PlatoRepository platoRepository;
 
     private static final Set<String> ESTADOS_VALIDOS = Set.of(
             "Pendiente",
@@ -25,8 +32,9 @@ public class DeliveryController {
             "Cancelado"
     );
 
-    public DeliveryController(PedidoDeliveryRepository pedidoRepository) {
+    public DeliveryController(PedidoDeliveryRepository pedidoRepository, PlatoRepository platoRepository) {
         this.pedidoRepository = pedidoRepository;
+        this.platoRepository = platoRepository;
     }
 
     /**
@@ -53,36 +61,68 @@ public class DeliveryController {
     }
 
     /**
-     * Registrar un nuevo pedido.
+     * Registrar un nuevo pedido, junto con el detalle de platos vendidos
+     * (necesario para poder calcular después los platos más vendidos).
      */
     @PostMapping
     public ResponseEntity<?> registrarPedido(
-            @RequestBody Pedido_delivery pedido) {
+            @RequestBody PedidoDeliveryRequestDTO datos) {
 
-        if (pedido.getNombreCliente() == null
-                || pedido.getNombreCliente().trim().isEmpty()) {
+        if (datos.getNombreCliente() == null
+                || datos.getNombreCliente().trim().isEmpty()) {
             return ResponseEntity.badRequest()
                     .body(Map.of("mensaje",
                             "El nombre del cliente es obligatorio"));
         }
 
-        if (pedido.getDireccionEntrega() == null
-                || pedido.getDireccionEntrega().trim().isEmpty()) {
+        if (datos.getDireccionEntrega() == null
+                || datos.getDireccionEntrega().trim().isEmpty()) {
             return ResponseEntity.badRequest()
                     .body(Map.of("mensaje",
                             "La dirección de entrega es obligatoria"));
         }
 
-        if (pedido.getTotal() == null) {
+        if (datos.getTotal() == null) {
             return ResponseEntity.badRequest()
                     .body(Map.of("mensaje",
                             "El total del pedido es obligatorio"));
         }
 
-        if (pedido.getEstado() == null
-                || pedido.getEstado().trim().isEmpty()) {
-            pedido.setEstado("Pendiente");
+        Pedido_delivery pedido = new Pedido_delivery();
+        pedido.setUsuarioId(datos.getUsuarioId());
+        pedido.setNombreCliente(datos.getNombreCliente());
+        pedido.setTelefonoContacto(datos.getTelefonoContacto());
+        pedido.setDireccionEntrega(datos.getDireccionEntrega());
+        pedido.setReferencia(datos.getReferencia());
+        pedido.setDistrito(datos.getDistrito());
+        pedido.setSubtotal(datos.getSubtotal());
+        pedido.setCostoEnvio(datos.getCostoEnvio());
+        pedido.setDescuento(datos.getDescuento());
+        pedido.setTotal(datos.getTotal());
+        pedido.setMetodoPago(datos.getMetodoPago());
+        pedido.setEstado(
+                (datos.getEstado() == null || datos.getEstado().trim().isEmpty())
+                        ? "Pendiente" : datos.getEstado()
+        );
+
+        List<DetallePedidoDelivery> detalles = new ArrayList<>();
+        if (datos.getItems() != null) {
+            for (ItemPedidoDTO itemDto : datos.getItems()) {
+                if (itemDto.getPlatoId() == null) continue;
+
+                Plato plato = platoRepository.findById(itemDto.getPlatoId())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Plato no encontrado con id: " + itemDto.getPlatoId()));
+
+                DetallePedidoDelivery detalle = new DetallePedidoDelivery();
+                detalle.setPedido(pedido);
+                detalle.setPlato(plato);
+                detalle.setCantidad(itemDto.getCantidad());
+                detalle.setPrecioUnitario(itemDto.getPrecioUnitario());
+                detalles.add(detalle);
+            }
         }
+        pedido.setDetalles(detalles);
 
         Pedido_delivery guardado = pedidoRepository.save(pedido);
 

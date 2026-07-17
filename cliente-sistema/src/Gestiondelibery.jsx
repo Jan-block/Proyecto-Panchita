@@ -141,7 +141,8 @@ export default function GestionDelivery() {
   const [tab, setTab]                       = useState('pedidos'); // 'pedidos' | 'repartidores' | 'zonas'
 
   // Nuevo pedido
-  const [nuevoItem, setNuevoItem]           = useState({ nombre: '', qty: 1, precio: '' });
+  const [platosDisponibles, setPlatosDisponibles] = useState([]);
+  const [nuevoItem, setNuevoItem]           = useState({ platoId: '', qty: 1 });
   const [nuevoPedido, setNuevoPedido]       = useState({
     cliente: '', telefono: '', sinCuenta: false,
     direccion: '', distrito: '', notas: '',
@@ -175,6 +176,18 @@ export default function GestionDelivery() {
   };
 
   cargarPedidosDesdeBD();
+
+  const cargarPlatosDesdeBD = async () => {
+    try {
+      const respuesta = await apiFetch('/api/platos');
+      if (!respuesta.ok) throw new Error('Error al cargar los platos');
+      const datos = await respuesta.json();
+      setPlatosDisponibles(datos.filter(p => p.state === 1));
+    } catch (error) {
+      console.error('Error cargando platos:', error);
+    }
+  };
+  cargarPlatosDesdeBD();
 }, []);
 
   // ── Métricas ──────────────────────────────────────────────────────────────
@@ -292,9 +305,14 @@ export default function GestionDelivery() {
 
   // ── Nuevo pedido ──────────────────────────────────────────────────────────
   const agregarItemNuevo = () => {
-    if (!nuevoItem.nombre || !nuevoItem.precio) return;
-    setNuevoPedido(p => ({ ...p, items: [...p.items, { ...nuevoItem, precio: Number(nuevoItem.precio) }] }));
-    setNuevoItem({ nombre: '', qty: 1, precio: '' });
+    if (!nuevoItem.platoId || !nuevoItem.qty) return;
+    const plato = platosDisponibles.find(p => p.id === Number(nuevoItem.platoId));
+    if (!plato) return;
+    setNuevoPedido(p => ({
+      ...p,
+      items: [...p.items, { platoId: plato.id, nombre: plato.name, qty: Number(nuevoItem.qty), precio: plato.price }],
+    }));
+    setNuevoItem({ platoId: '', qty: 1 });
   };
 
  const confirmarNuevoPedido = async () => {
@@ -344,6 +362,11 @@ export default function GestionDelivery() {
     total,
     metodoPago: nuevoPedido.metodoPago,
     estado: 'Pendiente',
+    items: nuevoPedido.items.map(it => ({
+      platoId: it.platoId,
+      cantidad: it.qty,
+      precioUnitario: it.precio,
+    })),
   };
 
   try {
@@ -931,12 +954,15 @@ export default function GestionDelivery() {
             <div className="nuevo-items-section">
               <p className="nuevo-items-title">Ítems del pedido</p>
               <div className="nuevo-item-row">
-                <input placeholder="Nombre del plato" value={nuevoItem.nombre}
-                  onChange={e => setNuevoItem(i => ({...i, nombre: e.target.value}))} />
+                <select value={nuevoItem.platoId}
+                  onChange={e => setNuevoItem(i => ({...i, platoId: e.target.value}))}>
+                  <option value="">Seleccionar plato...</option>
+                  {platosDisponibles.map(p => (
+                    <option key={p.id} value={p.id}>{p.name} — S/ {p.price?.toFixed(2)}</option>
+                  ))}
+                </select>
                 <input type="number" min="1" placeholder="Cant." value={nuevoItem.qty}
                   onChange={e => setNuevoItem(i => ({...i, qty: Number(e.target.value)}))} style={{width:70}} />
-                <input type="number" placeholder="Precio unit." value={nuevoItem.precio}
-                  onChange={e => setNuevoItem(i => ({...i, precio: e.target.value}))} style={{width:110}} />
                 <button className="btn-add-item" onClick={agregarItemNuevo}>+</button>
               </div>
               {nuevoPedido.items.length > 0 && (

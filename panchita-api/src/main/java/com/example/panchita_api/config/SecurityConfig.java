@@ -35,19 +35,28 @@ public class SecurityConfig {
                 .authorizeRequests(auth -> auth
                         // Preflight de CORS: el navegador manda OPTIONS antes de cada request real
                         .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Rutas publicas: login y registro
+                        // Gestion de empleados: solo el administrador puede crear, listar o
+                        // editar cuentas de personal (cajero, mesero, chef, otro admin).
+                        .antMatchers("/api/auth/empleados/**").hasRole("ADMINISTRADOR")
+                        // Gestion de clientes (editar/desactivar): tambien solo administrador.
+                        .antMatchers("/api/usuarios/**").hasRole("ADMINISTRADOR")
+                        // Rutas publicas: login y registro de clientes
                         .antMatchers("/api/auth/**").permitAll()
                         // Health check publico para que el monitoreo externo pueda consultarlo sin
                         // token
                         .antMatchers("/actuator/health", "/actuator/info").permitAll()
-                        // El resto de Actuator (metrics) solo para administradores
-                        .antMatchers(
-                                "/api/admin/**",
-                                "/api/reportes/**",
-                                "/api/delivery/**")
-                        .hasRole("ADMINISTRADOR") // Rutas administrativas: dashboard y reportes
+                        // Rutas administrativas: dashboard, reportes y auditoria general
                         .antMatchers("/api/admin/**", "/api/reportes/**").hasRole("ADMINISTRADOR")
-                        // Todo lo demas requiere estar logueado (con cualquier rol)
+                        // Inventario: solo quien cocina (chef) o el administrador puede dar de alta
+                        // productos, registrar compras/consumos o editar el maestro de insumos.
+                        .antMatchers(HttpMethod.POST, "/api/inventario/**").hasAnyRole("CHEF", "ADMINISTRADOR")
+                        .antMatchers(HttpMethod.PUT, "/api/inventario/**").hasAnyRole("CHEF", "ADMINISTRADOR")
+                        .antMatchers(HttpMethod.PATCH, "/api/inventario/**").hasAnyRole("CHEF", "ADMINISTRADOR")
+                        // Delivery: el cajero es quien gestiona los pedidos externos junto al
+                        // administrador (antes esto era exclusivo de ADMINISTRADOR).
+                        .antMatchers("/api/delivery/**").hasAnyRole("CAJERO", "ADMINISTRADOR")
+                        // Todo lo demas requiere estar logueado (con cualquier rol: cliente,
+                        // mesero, cajero, chef o administrador)
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
