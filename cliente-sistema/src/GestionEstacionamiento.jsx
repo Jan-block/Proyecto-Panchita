@@ -134,7 +134,7 @@ export default function GestionEstacionamiento() {
     <div className="estacionamiento-container">
       <div className="estacionamiento-header">
         <div>
-          <h1 className="estacionamiento-titulo">🚗 Estacionamiento</h1>
+          <h1 className="estacionamiento-titulo"> Estacionamiento</h1>
           <p className="estacionamiento-subtitulo">Vista en tiempo real · {TOTAL_ESPACIOS} espacios en total</p>
         </div>
         <button className="btn-refresh" onClick={cargarReservas}>↻ Actualizar</button>

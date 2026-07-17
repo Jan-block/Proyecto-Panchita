@@ -297,7 +297,7 @@ export default function NuestraCarta({ usuarioLogueado }) {
             <div className="plato-card__body">
               <div className="plato-card__info">
                 <h3 className="plato-card__nombre">{plato.name}</h3>
-                <p className="plato-card__descripcion">{plato.description}</p>
+                <p className="plato-card__desc">{plato.description}</p>
               </div>
               <div className="plato-card__footer">
                 <span className="plato-card__precio">S/ {plato.price.toFixed(2)}</span>
