@@ -201,12 +201,32 @@ export default function GestionDelivery() {
   const distritos = [...new Set(pedidos.map(p => p.distrito))].sort();
 
   // ── Acciones ──────────────────────────────────────────────────────────────
-  const avanzarEstado = (id) => {
+  const avanzarEstado = async (id) => {
+    const pedido = pedidos.find(p => p.id === id);
+    if (!pedido) return;
+    const siguiente = ESTADO_CONFIG[pedido.estado]?.siguiente;
+    if (!siguiente) return;
+
+    try {
+      const respuesta = await apiFetch(`/api/delivery/${id}/estado`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: siguiente }),
+      });
+
+      if (!respuesta.ok) {
+        const mensaje = await respuesta.text();
+        throw new Error(`No se pudo actualizar el estado. Error ${respuesta.status}: ${mensaje}`);
+      }
+    } catch (error) {
+      console.error('Error actualizando estado:', error);
+      alert(error.message);
+      return; // si falla el guardado, no tocamos la pantalla
+    }
+
+    const ahora = new Date().toISOString();
     setPedidos(prev => prev.map(p => {
       if (p.id !== id) return p;
-      const siguiente = ESTADO_CONFIG[p.estado]?.siguiente;
-      if (!siguiente) return p;
-      const ahora = new Date().toISOString();
       return {
         ...p,
         estado: siguiente,
@@ -217,9 +237,6 @@ export default function GestionDelivery() {
     }));
     setPedidoDetalle(d => {
       if (!d || d.id !== id) return d;
-      const siguiente = ESTADO_CONFIG[d.estado]?.siguiente;
-      if (!siguiente) return d;
-      const ahora = new Date().toISOString();
       return {
         ...d, estado: siguiente,
         tsPrepando:  siguiente === 'Preparando' ? ahora : d.tsPrepando,
@@ -236,13 +253,34 @@ export default function GestionDelivery() {
     setMostrarCancelModal(id);
   };
 
-  const confirmarCancelacion = () => {
+  const confirmarCancelacion = async () => {
     const motivo = motivoSeleccionado === 'Otro' ? motivoCustom : motivoSeleccionado;
     if (!motivo) return;
+    const id = mostrarCancelModal;
+
+    try {
+      const respuesta = await apiFetch(`/api/delivery/${id}/estado`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'Cancelado' }),
+      });
+
+      if (!respuesta.ok) {
+        const mensaje = await respuesta.text();
+        throw new Error(`No se pudo cancelar el pedido. Error ${respuesta.status}: ${mensaje}`);
+      }
+    } catch (error) {
+      console.error('Error cancelando pedido:', error);
+      alert(error.message);
+      return;
+    }
+
+    // Nota: el motivo de cancelación solo se guarda en pantalla por ahora,
+    // porque el backend todavía no tiene una columna para persistirlo.
     setPedidos(prev => prev.map(p =>
-      p.id === mostrarCancelModal ? { ...p, estado: 'Cancelado', motivoCancelacion: motivo } : p
+      p.id === id ? { ...p, estado: 'Cancelado', motivoCancelacion: motivo } : p
     ));
-    setPedidoDetalle(d => d?.id === mostrarCancelModal ? { ...d, estado: 'Cancelado', motivoCancelacion: motivo } : d);
+    setPedidoDetalle(d => d?.id === id ? { ...d, estado: 'Cancelado', motivoCancelacion: motivo } : d);
     setMostrarCancelModal(null);
   };
 
