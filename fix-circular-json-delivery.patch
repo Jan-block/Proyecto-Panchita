@@ -1,0 +1,26 @@
+diff --git a/panchita-api/src/main/java/com/example/panchita_api/model/DetallePedidoDelivery.java b/panchita-api/src/main/java/com/example/panchita_api/model/DetallePedidoDelivery.java
+index 4ff8770..730bfb9 100644
+--- a/panchita-api/src/main/java/com/example/panchita_api/model/DetallePedidoDelivery.java
++++ b/panchita-api/src/main/java/com/example/panchita_api/model/DetallePedidoDelivery.java
+@@ -2,6 +2,8 @@ package com.example.panchita_api.model;
+ 
+ import java.math.BigDecimal;
+ 
++import com.fasterxml.jackson.annotation.JsonIgnore;
++
+ import javax.persistence.*;
+ 
+ // Cada fila representa un plato específico dentro de un pedido de delivery.
+@@ -15,8 +17,12 @@ public class DetallePedidoDelivery {
+     @GeneratedValue(strategy = GenerationType.IDENTITY)
+     private Integer id;
+ 
++    // JsonIgnore: sin esto, al convertir el pedido a JSON se genera un bucle
++    // infinito (pedido -> detalles -> detalle.pedido -> detalles -> ...) que
++    // rompe la respuesta del backend a mitad de camino.
+     @ManyToOne
+     @JoinColumn(name = "pedido_id", nullable = false)
++    @JsonIgnore
+     private Pedido_delivery pedido;
+ 
+     @ManyToOne
