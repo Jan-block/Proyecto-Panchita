@@ -164,6 +164,29 @@ export default function NuestraCarta({ usuarioLogueado }) {
     }
   };
 
+  // ── ELIMINAR ──
+  const handleEliminar = async (plato) => {
+    const confirmado = window.confirm(`¿Eliminar "${plato.name}" definitivamente? Esta acción no se puede deshacer.`);
+    if (!confirmado) return;
+
+    try {
+      const response = await apiFetch(`/api/platos?id=${plato.id}`, { method: 'DELETE' });
+
+      if (response.status === 409) {
+        const data = await response.json().catch(() => ({}));
+        mostrarToast(data.error || 'No se puede eliminar: el plato está en uso.', 'err');
+        return;
+      }
+      if (!response.ok) throw new Error('Error al eliminar el plato');
+
+      setPlatos(prev => prev.filter(p => p.id !== plato.id));
+      mostrarToast('Plato eliminado correctamente ✓');
+    } catch (err) {
+      console.error(err);
+      mostrarToast('Error al eliminar el plato', 'err');
+    }
+  };
+
   // ── TOGGLE ESTADO ──
   const toggleEstado = async (plato) => {
     try {
@@ -279,12 +302,21 @@ export default function NuestraCarta({ usuarioLogueado }) {
               <div className="plato-card__footer">
                 <span className="plato-card__precio">S/ {plato.price.toFixed(2)}</span>
                 {esAdmin && (
-                  <button
-                    className="plato-card__btn"
-                    onClick={() => abrirModalEditar(plato)}
-                  >
-                    Actualizar
-                  </button>
+                  <div className="plato-card__acciones">
+                    <button
+                      className="plato-card__btn"
+                      onClick={() => abrirModalEditar(plato)}
+                    >
+                      Actualizar
+                    </button>
+                    <button
+                      className="plato-card__btn plato-card__btn--eliminar"
+                      onClick={() => handleEliminar(plato)}
+                      title="Eliminar plato"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

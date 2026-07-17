@@ -249,6 +249,32 @@
   }
   .plato-card__add--admin:hover { background: var(--charcoal); }
 
+  .plato-card__acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .plato-card__btn {
+    background: var(--espresso);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .plato-card__btn:hover { background: var(--charcoal); transform: scale(1.04); }
+  .plato-card__btn--eliminar {
+    background: transparent;
+    border: 1px solid var(--rust);
+    color: var(--rust);
+    padding: 8px 12px;
+  }
+  .plato-card__btn--eliminar:hover { background: var(--rust); color: #fff; }
+
   /* ── TOAST ── */
   .carta-toast {
     position: fixed;
