@@ -1,0 +1,161 @@
+diff --git a/cliente-sistema/src/NuestraCarta.css b/cliente-sistema/src/NuestraCarta.css
+index 1fe3a65..1439aae 100644
+--- a/cliente-sistema/src/NuestraCarta.css
++++ b/cliente-sistema/src/NuestraCarta.css
+@@ -249,6 +249,32 @@
+   }
+   .plato-card__add--admin:hover { background: var(--charcoal); }
+ 
++  .plato-card__acciones {
++    display: flex;
++    align-items: center;
++    gap: 8px;
++  }
++  .plato-card__btn {
++    background: var(--espresso);
++    color: #fff;
++    border: none;
++    border-radius: 50px;
++    padding: 8px 18px;
++    font-size: .82rem;
++    font-weight: 600;
++    cursor: pointer;
++    transition: background .2s, transform .15s;
++    font-family: 'Inter', sans-serif;
++  }
++  .plato-card__btn:hover { background: var(--charcoal); transform: scale(1.04); }
++  .plato-card__btn--eliminar {
++    background: transparent;
++    border: 1px solid var(--rust);
++    color: var(--rust);
++    padding: 8px 12px;
++  }
++  .plato-card__btn--eliminar:hover { background: var(--rust); color: #fff; }
++
+   /* ── TOAST ── */
+   .carta-toast {
+     position: fixed;
+diff --git a/cliente-sistema/src/NuestraCarta.jsx b/cliente-sistema/src/NuestraCarta.jsx
+index 76d2a07..94a7b44 100644
+--- a/cliente-sistema/src/NuestraCarta.jsx
++++ b/cliente-sistema/src/NuestraCarta.jsx
+@@ -164,6 +164,29 @@ export default function NuestraCarta({ usuarioLogueado }) {
+     }
+   };
+ 
++  // ── ELIMINAR ──
++  const handleEliminar = async (plato) => {
++    const confirmado = window.confirm(`¿Eliminar "${plato.name}" definitivamente? Esta acción no se puede deshacer.`);
++    if (!confirmado) return;
++
++    try {
++      const response = await apiFetch(`/api/platos?id=${plato.id}`, { method: 'DELETE' });
++
++      if (response.status === 409) {
++        const data = await response.json().catch(() => ({}));
++        mostrarToast(data.error || 'No se puede eliminar: el plato está en uso.', 'err');
++        return;
++      }
++      if (!response.ok) throw new Error('Error al eliminar el plato');
++
++      setPlatos(prev => prev.filter(p => p.id !== plato.id));
++      mostrarToast('Plato eliminado correctamente ✓');
++    } catch (err) {
++      console.error(err);
++      mostrarToast('Error al eliminar el plato', 'err');
++    }
++  };
++
+   // ── TOGGLE ESTADO ──
+   const toggleEstado = async (plato) => {
+     try {
+@@ -279,12 +302,21 @@ export default function NuestraCarta({ usuarioLogueado }) {
+               <div className="plato-card__footer">
+                 <span className="plato-card__precio">S/ {plato.price.toFixed(2)}</span>
+                 {esAdmin && (
+-                  <button
+-                    className="plato-card__btn"
+-                    onClick={() => abrirModalEditar(plato)}
+-                  >
+-                    Actualizar
+-                  </button>
++                  <div className="plato-card__acciones">
++                    <button
++                      className="plato-card__btn"
++                      onClick={() => abrirModalEditar(plato)}
++                    >
++                      Actualizar
++                    </button>
++                    <button
++                      className="plato-card__btn plato-card__btn--eliminar"
++                      onClick={() => handleEliminar(plato)}
++                      title="Eliminar plato"
++                    >
++                      🗑️
++                    </button>
++                  </div>
+                 )}
+               </div>
+             </div>
+diff --git a/panchita-api/src/main/java/com/example/panchita_api/controller/PlatoController.java b/panchita-api/src/main/java/com/example/panchita_api/controller/PlatoController.java
+index 4dbfe1b..8bcae1c 100644
+--- a/panchita-api/src/main/java/com/example/panchita_api/controller/PlatoController.java
++++ b/panchita-api/src/main/java/com/example/panchita_api/controller/PlatoController.java
+@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.http.ResponseEntity;
+ import org.springframework.web.bind.annotation.*;
+ 
++import java.util.Map;
++
+ import com.example.panchita_api.model.Plato;
++import com.example.panchita_api.repository.MenuRepository;
+ import com.example.panchita_api.repository.PlatoRepository;
+ 
+ @RestController
+@@ -17,6 +20,9 @@ public class PlatoController {
+     @Autowired
+     private PlatoRepository platoRepo;
+ 
++    @Autowired
++    private MenuRepository menuRepo;
++
+     @GetMapping
+     public ResponseEntity<List<Plato>> listar() {
+         return ResponseEntity.ok(platoRepo.findAll());
+@@ -49,4 +55,23 @@ public class PlatoController {
+         return ResponseEntity.ok(platoRepo.save(existente));
+     }
+ 
++    @DeleteMapping
++    public ResponseEntity<?> eliminar(@RequestParam Integer id) {
++        Plato existente = platoRepo.findById(id)
++                .orElseThrow(() -> new RuntimeException("Plato no encontrado con id: " + id));
++
++        // Si el plato está siendo usado como entrada, fondo o bebida en algún
++        // menú, no se puede borrar directamente para no romper esa relación.
++        boolean usadoEnMenu = menuRepo.existsByEntrada_IdOrFondo_IdOrBebida_Id(id, id, id);
++        if (usadoEnMenu) {
++            return ResponseEntity.status(409).body(Map.of(
++                    "error", "No se puede eliminar: el plato '" + existente.getName()
++                            + "' está usado en uno o más menús. Quítalo del menú primero o desactívalo en vez de eliminarlo."
++            ));
++        }
++
++        platoRepo.delete(existente);
++        return ResponseEntity.noContent().build();
++    }
++
+ }
+diff --git a/panchita-api/src/main/java/com/example/panchita_api/repository/MenuRepository.java b/panchita-api/src/main/java/com/example/panchita_api/repository/MenuRepository.java
+index 2ddae2b..917cf9e 100644
+--- a/panchita-api/src/main/java/com/example/panchita_api/repository/MenuRepository.java
++++ b/panchita-api/src/main/java/com/example/panchita_api/repository/MenuRepository.java
+@@ -6,4 +6,7 @@ import com.example.panchita_api.model.Menu;
+ 
+ public interface MenuRepository extends JpaRepository<Menu, Integer> {
+ 
++    // Permite verificar si un plato está siendo usado como entrada, fondo o
++    // bebida en algún menú, antes de permitir borrarlo.
++    boolean existsByEntrada_IdOrFondo_IdOrBebida_Id(Integer entradaId, Integer fondoId, Integer bebidaId);
+ }
+\ No newline at end of file
